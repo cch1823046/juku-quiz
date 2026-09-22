@@ -58,11 +58,12 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 /* GRID */
 .grid-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-inline:-2px;padding-inline:2px;}
 .mas-tbl{border-collapse:separate;border-spacing:2px;width:100%;min-width:280px;}
-.hc{background:var(--hdr-bg);color:var(--hdr-txt);font-size:12px;font-weight:900;text-align:center;border-radius:5px;padding:4px 1px;font-variant-numeric:tabular-nums;min-width:24px;}
+.hc{background:var(--hdr-bg);color:var(--hdr-txt);font-size:12px;font-weight:900;text-align:center;border-radius:5px;padding:4px 1px;font-variant-numeric:tabular-nums;min-width:28px;}
 .hc.corner{font-size:14px;background:var(--text);color:var(--bg);}
-.rc{background:var(--row-bg);color:var(--row-txt);font-size:12px;font-weight:900;text-align:center;border-radius:5px;padding:4px 1px;font-variant-numeric:tabular-nums;min-width:24px;}
+.rc{background:var(--row-bg);color:var(--row-txt);font-size:12px;font-weight:900;text-align:center;border-radius:5px;padding:4px 1px;font-variant-numeric:tabular-nums;min-width:28px;}
 .rc.qmark{background:#94A3B8;color:#94A3B8;user-select:none;font-size:10px;}
-.mi{width:100%;min-width:24px;height:28px;border:2px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-family:inherit;font-size:12px;font-weight:800;text-align:center;outline:none;font-variant-numeric:tabular-nums;-moz-appearance:textfield;padding:0;transition:border-color .1s,background .1s;display:block;}
+.mi{width:100%;min-width:28px;height:36px;border:2px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;font-weight:800;text-align:center;outline:none;font-variant-numeric:tabular-nums;-moz-appearance:textfield;padding:0;transition:border-color .1s,background .1s;display:block;}
+@media(max-width:400px){.hc,.rc{min-width:26px;font-size:11px;}.mi{height:34px;font-size:13px;min-width:26px;}.mas-tbl{border-spacing:2px;}}
 .mi::-webkit-inner-spin-button,.mi::-webkit-outer-spin-button{-webkit-appearance:none;}
 .mi:focus{border-color:var(--accent);background:#EEF2FF;}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .mi:focus{background:#1E1B40;}}
@@ -279,6 +280,7 @@ function buildGrid(){
       const td=row.insertCell();
       const inp=document.createElement('input');
       inp.type='number';
+      inp.inputMode='numeric';
       inp.id='i'+r+'_'+c;
       const ans=calcAns(r,c);
       inp.setAttribute('data-ans',ans);
