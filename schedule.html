@@ -1,0 +1,500 @@
+<title>中受験スケジュール</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap">
+<style>
+:root{
+  --bg:#F0F4FF; --surface:#FFF; --s2:#F5F7FF; --border:#E0E7FF;
+  --text:#1E1B4B; --muted:#64748B; --shadow:0 3px 16px rgba(79,70,229,.09); --r:16px;
+  --accent:#4F46E5; --ok:#16A34A; --gold:#D97706;
+  --kanji-c:#DC2626; --kanji-bg:#FFF5F5; --kanji-grd:linear-gradient(135deg,#F87171,#DC2626);
+  --math-c:#1D4ED8;  --math-bg:#EFF6FF;  --math-grd:linear-gradient(135deg,#60A5FA,#1D4ED8);
+  --sci-c:#15803D;   --sci-bg:#F0FFF4;   --sci-grd:linear-gradient(135deg,#4ADE80,#15803D);
+  --soc-c:#B45309;   --soc-bg:#FFFBEB;   --soc-grd:linear-gradient(135deg,#FCD34D,#B45309);
+  --eng-c:#7C3AED;   --eng-bg:#FAF5FF;   --eng-grd:linear-gradient(135deg,#C084FC,#7C3AED);
+  --rev-c:#BE185D;   --rev-bg:#FDF2F8;   --rev-grd:linear-gradient(135deg,#F9A8D4,#BE185D);
+  --am-c:#F59E0B; --pm-c:#4F46E5;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0C0E1C; --surface:#161929; --s2:#111320; --border:#272B4A;
+  --text:#EAECF8; --muted:#8B90B8; --shadow:0 3px 16px rgba(0,0,0,.4);
+  --kanji-bg:#2D0A0A; --math-bg:#0C1F3A; --sci-bg:#0A2318; --soc-bg:#241500; --eng-bg:#1A1035;
+}}
+:root[data-theme=dark]{
+  --bg:#0C0E1C; --surface:#161929; --s2:#111320; --border:#272B4A;
+  --text:#EAECF8; --muted:#8B90B8; --shadow:0 3px 16px rgba(0,0,0,.4);
+  --kanji-bg:#2D0A0A; --math-bg:#0C1F3A; --sci-bg:#0A2318; --soc-bg:#241500; --eng-bg:#1A1035;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;background:var(--bg);color:var(--text);padding-inline:16px;padding-block:20px 48px;max-width:540px;margin-inline:auto;}
+.hidden{display:none!important;}
+
+/* SETUP */
+.su-title{font-size:24px;font-weight:900;text-align:center;margin-bottom:4px;}
+.su-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:22px;font-weight:700;}
+.su-card{background:var(--surface);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:12px;}
+.su-card h3{font-size:14px;font-weight:800;color:var(--accent);margin-bottom:14px;}
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sj-lbl{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--s2);border-radius:12px;border:2.5px solid transparent;cursor:pointer;font-size:14px;font-weight:800;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.sj-lbl input{display:none;}
+.sj-lbl.on{border-color:var(--accent);background:#EEF2FF;}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .sj-lbl.on{background:#1E1B40;}}
+:root[data-theme=dark] .sj-lbl.on{background:#1E1B40;}
+.time-info{background:var(--s2);border-radius:12px;padding:14px 16px;font-size:13px;font-weight:800;line-height:2;color:var(--text);}
+.time-info span{color:var(--muted);font-weight:700;}
+.gen-btn{width:100%;background:linear-gradient(135deg,#4F46E5,#818CF8);border:none;border-radius:14px;padding:17px;font-family:inherit;font-size:17px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(79,70,229,.3);-webkit-tap-highlight-color:transparent;transition:transform .12s;}
+.gen-btn:active{transform:scale(.97);}
+
+/* APP HEADER */
+.app-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;}
+.app-title{font-size:17px;font-weight:900;color:var(--accent);}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.streak-pill{display:flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:800;box-shadow:var(--shadow);}
+.cfg-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+
+/* TODAY HERO */
+.today-hero{background:var(--surface);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);margin-bottom:12px;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.hero-day{font-size:32px;font-weight:900;line-height:1;}
+.hero-date{font-size:12px;color:var(--muted);font-weight:700;margin-top:4px;}
+.ring-wrap{position:relative;width:60px;height:60px;flex-shrink:0;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:6;}
+.ring-fg{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .4s ease;}
+.ring-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;}
+.hero-pts{font-size:13px;color:var(--gold);font-weight:800;text-align:right;margin-top:4px;}
+
+/* TIME BLOCK HEADERS */
+.block-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;margin-top:14px;}
+.block-hdr:first-child{margin-top:0;}
+.block-ico{font-size:18px;}
+.block-name{font-size:13px;font-weight:900;color:var(--muted);}
+.block-time{font-size:12px;font-weight:700;color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums;}
+
+/* TASK ITEM */
+.task-item{display:flex;align-items:stretch;background:var(--s2);border-radius:12px;overflow:hidden;border:2px solid var(--border);transition:opacity .2s;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-bottom:6px;}
+.task-item.done{opacity:.55;}
+.task-item.done .task-name{text-decoration:line-through;}
+.task-stripe{width:5px;flex-shrink:0;}
+.task-body{flex:1;padding:11px 12px 11px 10px;display:flex;align-items:center;gap:10px;min-width:0;}
+.chk-box{flex-shrink:0;width:26px;height:26px;border-radius:8px;border:2.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .18s;}
+.task-item.done .chk-box{background:var(--ok);border-color:var(--ok);color:#fff;}
+.task-info{flex:1;min-width:0;}
+.task-name{font-size:14px;font-weight:800;margin-bottom:2px;}
+.task-sub{font-size:11px;color:var(--muted);font-weight:700;}
+.quiz-btn{flex-shrink:0;border:none;border-radius:8px;padding:7px 10px;font-family:inherit;font-size:11px;font-weight:900;color:#fff;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;text-decoration:none;display:flex;align-items:center;gap:3px;}
+
+/* BREAK ROW */
+.break-row{display:flex;align-items:center;gap:8px;margin:6px 0;padding:7px 12px;background:var(--border);border-radius:8px;font-size:12px;font-weight:800;color:var(--muted);}
+.break-row span{margin-left:auto;font-variant-numeric:tabular-nums;}
+
+.all-done-banner{background:linear-gradient(135deg,#4F46E5,#818CF8);color:#fff;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:900;text-align:center;margin-top:10px;}
+
+/* WEEK STRIP */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px;}
+.wday{background:var(--surface);border-radius:10px;padding:8px 4px;text-align:center;border:2px solid transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s;}
+.wday.today{border-color:var(--accent);}
+.wday.viewing{background:#EEF2FF;}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .wday.viewing{background:#1E1B40;}}
+:root[data-theme=dark] .wday.viewing{background:#1E1B40;}
+.wd-lbl{font-size:10px;font-weight:800;color:var(--muted);}
+.wd-ico{font-size:18px;margin:3px 0;}
+.wd-prog{font-size:10px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;}
+.wd-prog.full{color:var(--ok);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-box{background:var(--surface);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);}
+.stat-lbl{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;}
+.stat-val{font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--accent);}
+
+/* EIKEN */
+.eiken-bar{background:var(--surface);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);margin-bottom:14px;}
+.eiken-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.eiken-lbl{font-size:12px;font-weight:800;color:var(--muted);}
+.eiken-goal{font-size:13px;font-weight:900;color:var(--eng-c);}
+.eiken-track{background:var(--s2);border-radius:99px;height:8px;overflow:hidden;margin-bottom:4px;}
+.eiken-fill{height:100%;border-radius:99px;background:var(--eng-grd);transition:width .4s ease;}
+.eiken-sub{font-size:11px;color:var(--muted);font-weight:700;}
+</style>
+
+<!-- SETUP -->
+<div id="s-setup">
+  <p class="su-title">📋 スケジュール設定</p>
+  <p class="su-sub">苦手な科目を選ぼう！</p>
+
+  <div class="su-card">
+    <h3>📚 苦手な科目（複数OK）</h3>
+    <div class="subj-grid">
+      <label class="sj-lbl" id="lbl-kanji"><input type="checkbox" value="kanji" onchange="toggleSj(this)"> 📝 国語・漢字</label>
+      <label class="sj-lbl" id="lbl-math"><input type="checkbox" value="math" onchange="toggleSj(this)"> 🔢 算数</label>
+      <label class="sj-lbl" id="lbl-sci"><input type="checkbox" value="sci" onchange="toggleSj(this)"> 🔬 理科</label>
+      <label class="sj-lbl" id="lbl-soc"><input type="checkbox" value="soc" onchange="toggleSj(this)"> 🌍 社会</label>
+      <label class="sj-lbl" id="lbl-eng"><input type="checkbox" value="eng" onchange="toggleSj(this)"> 🇬🇧 英語</label>
+    </div>
+  </div>
+
+  <div class="su-card">
+    <h3>⏰ 毎日の勉強時間割（固定）</h3>
+    <div class="time-info">
+      ☀️ 朝の部<span>　30分</span><br>
+      🌙 夜の部　19:00〜 <span>30分 → ☕20分休憩 → 30分 → ☕20分休憩 → 30分</span><br>
+      📚 合計 <span>1日 120分（4コマ）</span>
+    </div>
+  </div>
+
+  <button class="gen-btn" onclick="applySetup()">✨ スケジュールを作る！</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="s-app" class="hidden">
+  <header class="app-hdr">
+    <div class="app-title">📖 学習スケジュール</div>
+    <div class="hdr-right">
+      <div class="streak-pill">🔥 <span id="streak-num">0</span>日</div>
+      <button class="cfg-btn" onclick="openSetup()">⚙️ 設定</button>
+    </div>
+  </header>
+
+  <div class="today-hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-day" id="hero-day">月曜日</div>
+        <div class="hero-date" id="hero-date"></div>
+      </div>
+      <div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 60 60" width="60" height="60">
+            <circle class="ring-bg" cx="30" cy="30" r="24"/>
+            <circle class="ring-fg" cx="30" cy="30" r="24" id="ring-fg"
+              stroke-dasharray="150.8" stroke-dashoffset="150.8"/>
+          </svg>
+          <div class="ring-txt" id="ring-txt">0%</div>
+        </div>
+        <div class="hero-pts" id="hero-pts">⭐ 0 pt</div>
+      </div>
+    </div>
+    <div id="schedule-body"></div>
+    <div class="all-done-banner hidden" id="done-banner">🎉 今日のタスクをすべて完了！すごい！</div>
+  </div>
+
+  <div class="week-strip" id="week-strip"></div>
+
+  <div id="eiken-bar" class="eiken-bar hidden">
+    <div class="eiken-top">
+      <span class="eiken-lbl">🎯 英検目標</span>
+      <span class="eiken-goal">英検4級</span>
+    </div>
+    <div class="eiken-track"><div class="eiken-fill" id="eiken-fill" style="width:0%"></div></div>
+    <div class="eiken-sub" id="eiken-sub">英語タスクをこなしてゲージをためよう！</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-lbl">⭐ 今週のポイント</div><div class="stat-val" id="stat-pts">0</div></div>
+    <div class="stat-box"><div class="stat-lbl">✅ 完了タスク数</div><div class="stat-val" id="stat-done">0</div></div>
+  </div>
+</div>
+
+<script>
+const QUIZ_URL='https://cch1823046.github.io/juku-quiz/';
+const LS_PROF='juku-sched-v4-prof';
+const LS_LOG='juku-sched-v4-log';
+
+const SUBJ={
+  kanji:{name:'国語・漢字',ico:'📝',grd:'var(--kanji-grd)',pts:10,
+    pool:[
+      {n:'漢字よみ 10問',d:'読みがなを書こう',qk:'jpn',lv:1},
+      {n:'ことわざ 5問',d:'意味を答えよう',qk:'jpn',lv:2},
+      {n:'慣用句 5問',d:'日本語のひょうげん',qk:'jpn',lv:2},
+      {n:'漢字むずかしい 5問',d:'5年・6年レベルに挑戦！',qk:'jpn',lv:3},
+    ]},
+  math:{name:'算数',ico:'🔢',grd:'var(--math-grd)',pts:10,
+    pool:[
+      {n:'計算問題 10問',d:'たし算・ひき算・かけ算・わり算',qk:'math',lv:1},
+      {n:'算数ちゅうきゅう 5問',d:'割合・速さ・図形',qk:'math',lv:2},
+      {n:'算数むずかしい 5問',d:'受験レベルに挑戦！',qk:'math',lv:3},
+    ]},
+  sci:{name:'理科',ico:'🔬',grd:'var(--sci-grd)',pts:8,
+    pool:[
+      {n:'理科きほん 10問',d:'植物・動物・天気',qk:'sci',lv:1},
+      {n:'理科ちゅうきゅう 5問',d:'実験・化学・電気',qk:'sci',lv:2},
+    ]},
+  soc:{name:'社会',ico:'🌍',grd:'var(--soc-grd)',pts:8,
+    pool:[
+      {n:'社会きほん 10問',d:'地図・地理の基本',qk:'soc',lv:1},
+      {n:'歴史問題 5問',d:'年号と出来事をおさらい',qk:'soc',lv:2},
+    ]},
+  eng:{name:'英語',ico:'🇬🇧',grd:'var(--eng-grd)',pts:12,
+    pool:[
+      {n:'英語きほん 10問',d:'英検5〜4級レベル',qk:'eng',lv:1},
+      {n:'英語ちゅうきゅう 5問',d:'英検4〜3級レベル',qk:'eng',lv:2},
+      {n:'英語むずかしい 5問',d:'英検3級チャレンジ！',qk:'eng',lv:3},
+    ]},
+  rev:{name:'復習',ico:'🔁',grd:'var(--rev-grd)',pts:15,
+    pool:[{n:'今週の復習',d:'間違えた問題を全部見直そう',qk:null,lv:null}]},
+};
+
+// Fixed daily schedule: 4 slots
+// Slot 0: 朝, Slot 1-3: 夜 19:00, 19:50, 20:40
+const SLOTS=[
+  {label:'☀️ 朝の部',time:'朝 30分'},
+  {label:'🌙 夜の部 ①',time:'19:00〜19:30'},
+  {label:'🌙 夜の部 ②',time:'19:50〜20:20'},
+  {label:'🌙 夜の部 ③',time:'20:40〜21:10'},
+];
+
+// Weekly subject rotation per slot
+// Builds a [7 days][4 slots] matrix of subject keys
+function buildWeekPlan(weaks){
+  const allSubjs=['kanji','math','sci','soc','eng'];
+  const weakSet=new Set(weaks);
+  // Priority list: weaks appear more often
+  const pri=[];
+  allSubjs.forEach(s=>{pri.push(s);if(weakSet.has(s)){pri.push(s);}});
+
+  const plan=[];
+  for(let d=0;d<7;d++){
+    if(d===0){ // Sunday = full review
+      plan.push(['rev','rev','rev','rev']);
+      continue;
+    }
+    const row=[];
+    for(let s=0;s<4;s++){
+      // Pick subject: rotate through pri list, offset by day×4+slot
+      const idx=((d-1)*4+s)%pri.length;
+      row.push(pri[idx]);
+    }
+    plan.push(row);
+  }
+  return plan;
+}
+
+// Pick task from pool for a subject on a given week+slot (rotate through pool)
+function pickTask(subjKey,weekOffset,slotIdx){
+  const pool=SUBJ[subjKey].pool;
+  return pool[(weekOffset+slotIdx)%pool.length];
+}
+
+const DAY_NAMES=['日','月','火','水','木','金','土'];
+const DAY_FULL=['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'];
+
+let profile={weaks:['kanji','eng']};
+let log={};
+let viewDate=new Date();
+
+function loadData(){
+  try{profile=JSON.parse(localStorage.getItem(LS_PROF))||profile;}catch{}
+  try{log=JSON.parse(localStorage.getItem(LS_LOG))||{};}catch{}
+}
+function saveLog(){try{localStorage.setItem(LS_LOG,JSON.stringify(log));}catch{}}
+function saveProfile(){try{localStorage.setItem(LS_PROF,JSON.stringify(profile));}catch{}}
+function dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function getWeekPlan(){return buildWeekPlan(profile.weaks);}
+
+function getDayTasks(d){
+  const dow=d.getDay();
+  const plan=getWeekPlan();
+  const subjRow=plan[dow];
+  // Get week number for task rotation
+  const start=new Date(d.getFullYear(),0,1);
+  const weekNum=Math.floor((d-start)/(7*86400000));
+  return subjRow.map((sk,si)=>{
+    const tmpl=pickTask(sk,weekNum,si);
+    return {
+      id:`d${dow}-s${si}-${sk}`,
+      slot:si,subj:sk,
+      name:tmpl.n,detail:tmpl.d,
+      pts:SUBJ[sk].pts,
+      qk:tmpl.qk,lv:tmpl.lv
+    };
+  });
+}
+
+function toggleSj(inp){
+  inp.closest('label').classList.toggle('on',inp.checked);
+}
+
+function applySetup(){
+  const weaks=[...document.querySelectorAll('.subj-grid input:checked')].map(i=>i.value);
+  if(weaks.length===0){alert('苦手な科目を1つ以上選んでね！');return;}
+  profile={weaks};
+  saveProfile();
+  showApp();
+}
+
+function openSetup(){
+  document.getElementById('s-app').classList.add('hidden');
+  document.getElementById('s-setup').classList.remove('hidden');
+  document.querySelectorAll('.subj-grid input').forEach(inp=>{
+    inp.checked=profile.weaks.includes(inp.value);
+    inp.closest('label').classList.toggle('on',inp.checked);
+  });
+}
+
+function showApp(){
+  document.getElementById('s-setup').classList.add('hidden');
+  document.getElementById('s-app').classList.remove('hidden');
+  viewDate=new Date();
+  render();
+}
+
+function render(){
+  renderToday();
+  renderWeekStrip();
+  renderStats();
+  renderEiken();
+}
+
+function renderToday(){
+  const d=viewDate;
+  const dow=d.getDay();
+  document.getElementById('hero-day').textContent=DAY_FULL[dow];
+  const mo=d.getMonth()+1, da=d.getDate();
+  document.getElementById('hero-date').textContent=mo+'月'+da+'日（'+DAY_NAMES[dow]+'）';
+
+  const tasks=getDayTasks(d);
+  const dk=dateKey(d);
+  const dl=log[dk]||{};
+
+  let doneCnt=0, pts=0;
+  const body=document.getElementById('schedule-body');
+  body.innerHTML='';
+
+  tasks.forEach((task,i)=>{
+    const isDone=!!dl[task.id];
+    if(isDone){doneCnt++;pts+=task.pts||10;}
+    const meta=SUBJ[task.subj];
+    const slot=SLOTS[task.slot];
+
+    // Block header
+    const hdr=document.createElement('div');
+    hdr.className='block-hdr';
+    hdr.innerHTML=`<span class="block-ico">${slot.label.split(' ')[0]}</span><span class="block-name">${slot.label.replace(/^.+? /,'')}</span><span class="block-time">${slot.time}</span>`;
+    body.appendChild(hdr);
+
+    // Task row
+    const item=document.createElement('div');
+    item.className='task-item'+(isDone?' done':'');
+    item.innerHTML=`
+      <div class="task-stripe" style="background:${meta.grd}"></div>
+      <div class="task-body">
+        <div class="chk-box">${isDone?'✓':''}</div>
+        <div class="task-info">
+          <div class="task-name">${meta.ico} ${task.name}</div>
+          <div class="task-sub">${task.detail} ／ +${task.pts}pt</div>
+        </div>
+        ${task.qk?`<a class="quiz-btn" href="${QUIZ_URL}#${task.qk}${task.lv||''}" target="_blank" rel="noopener" style="background:${meta.grd}" onclick="event.stopPropagation()">クイズ ▶</a>`:''}
+      </div>`;
+    item.addEventListener('click',()=>{
+      if(!log[dk]) log[dk]={};
+      log[dk][task.id]=!log[dk][task.id];
+      saveLog();render();
+    });
+    body.appendChild(item);
+
+    // Break rows between evening slots
+    if(i===1||i===2){
+      const br=document.createElement('div');
+      br.className='break-row';
+      br.innerHTML=`☕ 休憩 20分<span>${i===1?'19:30〜19:50':'20:20〜20:40'}</span>`;
+      body.appendChild(br);
+    }
+  });
+
+  // Ring
+  const pct=tasks.length>0?Math.round(doneCnt/tasks.length*100):0;
+  const circ=150.8;
+  document.getElementById('ring-fg').style.strokeDashoffset=circ-(circ*pct/100);
+  document.getElementById('ring-txt').textContent=pct+'%';
+  document.getElementById('hero-pts').textContent='⭐ '+pts+' pt';
+  document.getElementById('streak-num').textContent=calcStreak();
+
+  const banner=document.getElementById('done-banner');
+  banner.classList.toggle('hidden',doneCnt<tasks.length||tasks.length===0);
+}
+
+function renderWeekStrip(){
+  const strip=document.getElementById('week-strip');
+  strip.innerHTML='';
+  const today=new Date();
+  const dow=today.getDay();
+  const monday=new Date(today);
+  monday.setDate(today.getDate()-(dow===0?6:dow-1));
+
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const dk=dateKey(d);
+    const tasks=getDayTasks(d);
+    const dl=log[dk]||{};
+    const done=tasks.filter(t=>dl[t.id]).length;
+    const total=tasks.length;
+    const isToday=dateKey(d)===dateKey(today);
+    const isView=dateKey(d)===dateKey(viewDate);
+
+    const cell=document.createElement('div');
+    cell.className='wday'+(isToday?' today':'')+(isView?' viewing':'');
+    const ico=done===total&&total>0?'✅':done>0?'🔶':'⬜';
+    cell.innerHTML=`<div class="wd-lbl">${DAY_NAMES[d.getDay()]}</div><div class="wd-ico">${ico}</div><div class="wd-prog${done===total&&total>0?' full':''}">${done}/${total}</div>`;
+    cell.addEventListener('click',()=>{viewDate=new Date(d);render();});
+    strip.appendChild(cell);
+  }
+}
+
+function renderStats(){
+  const today=new Date();
+  const dow=today.getDay();
+  const monday=new Date(today);
+  monday.setDate(today.getDate()-(dow===0?6:dow-1));
+  let totalPts=0,totalDone=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const dk=dateKey(d);const dl=log[dk]||{};
+    getDayTasks(d).forEach(t=>{if(dl[t.id]){totalPts+=t.pts||10;totalDone++;}});
+  }
+  document.getElementById('stat-pts').textContent=totalPts;
+  document.getElementById('stat-done').textContent=totalDone;
+}
+
+function renderEiken(){
+  const show=profile.weaks.includes('eng');
+  document.getElementById('eiken-bar').classList.toggle('hidden',!show);
+  if(!show) return;
+  const today=new Date();
+  const dow=today.getDay();
+  const monday=new Date(today);
+  monday.setDate(today.getDate()-(dow===0?6:dow-1));
+  let eDone=0,eTotal=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const dk=dateKey(d);const dl=log[dk]||{};
+    getDayTasks(d).filter(t=>t.subj==='eng').forEach(t=>{eTotal++;if(dl[t.id])eDone++;});
+  }
+  const pct=eTotal>0?Math.min(100,Math.round(eDone/eTotal*100)):0;
+  document.getElementById('eiken-fill').style.width=pct+'%';
+  document.getElementById('eiken-sub').textContent=`今週の英語タスク: ${eDone}/${eTotal}完了 (${pct}%)`;
+}
+
+function calcStreak(){
+  let s=0;
+  const d=new Date();
+  // Check today first
+  const checkDay=(cd)=>{
+    const tasks=getDayTasks(cd);
+    const dl=log[dateKey(cd)]||{};
+    const done=tasks.filter(t=>dl[t.id]).length;
+    return done>=Math.ceil(tasks.length/2);
+  };
+  if(!checkDay(d)) d.setDate(d.getDate()-1);
+  for(let i=0;i<60;i++){
+    if(checkDay(d)) s++;
+    else break;
+    d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+
+// Init
+loadData();
+if(localStorage.getItem(LS_PROF)){showApp();}
+else{document.getElementById('s-setup').classList.remove('hidden');}
+</script>
