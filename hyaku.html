@@ -85,6 +85,16 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 .rs{font-size:22px;font-weight:900;margin-bottom:4px;}
 .rb{font-size:13px;color:var(--gold);font-weight:800;}
 .cok{color:var(--ok);} .cng{color:var(--ng);}
+/* COIN */
+.coin-earn{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #F59E0B;border-radius:14px;padding:16px;margin-top:14px;text-align:center;}
+.coin-earn-num{font-size:36px;font-weight:900;color:#B45309;font-variant-numeric:tabular-nums;line-height:1;}
+.coin-earn-lbl{font-size:12px;font-weight:800;color:#92400E;margin-top:2px;}
+.coin-total{font-size:13px;font-weight:800;color:#78350F;margin-top:8px;}
+.piggy-bar{background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:2px solid #FCD34D;border-radius:12px;padding:11px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);}
+.piggy-lbl{font-size:12px;font-weight:800;color:#92400E;}
+.piggy-v{font-size:22px;font-weight:900;color:#B45309;font-variant-numeric:tabular-nums;}
+@keyframes coinpop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.coin-earn{animation:coinpop .35s ease;}
 .retry-btn{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED);border:none;border-radius:14px;padding:16px;font-family:inherit;font-size:16px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(79,70,229,.3);margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
 .home-btn2{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
@@ -95,6 +105,11 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 <div id="s-home" class="screen">
   <p class="h-title">🧮 100ます計算</p>
   <p class="h-sub">タイマーで自己ベストに挑戦！</p>
+
+  <div class="piggy-bar" id="piggy-bar">
+    <span class="piggy-lbl">🐷 貯金箱</span>
+    <span class="piggy-v" id="piggy-v">¥0</span>
+  </div>
 
   <div id="best-bar" class="best-bar hidden">
     <span class="best-lbl" id="best-lbl">たし算 / かんたん　自己ベスト ⏱</span>
@@ -164,6 +179,11 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <div class="rtl">かかった時間</div>
     <div class="rs" id="rs"></div>
     <div class="rb" id="rb"></div>
+    <div class="coin-earn" id="coin-earn">
+      <div class="coin-earn-num" id="coin-earn-num">＋0円</div>
+      <div class="coin-earn-lbl">💰 今回ゲット！</div>
+      <div class="coin-total" id="coin-total">🐷 貯金箱：¥0</div>
+    </div>
   </div>
   <button class="retry-btn" onclick="retryDrill()">🔄 もう一度！</button>
   <button class="home-btn2" onclick="goHome()">🏠 ホームへ</button>
@@ -171,10 +191,15 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 
 <script>
 const LS='hyaku-best';
+const LS_COIN='hyaku-coin';
 let curOp='+', curLv=1;
 let rowNums=[], colNums=[];
 let timerInt=null, startMs=0;
 let isChecked=false;
+
+function getCoins(){try{return parseInt(localStorage.getItem(LS_COIN))||0;}catch{return 0;}}
+function addCoins(n){try{const v=getCoins()+n;localStorage.setItem(LS_COIN,v);return v;}catch{return n;}}
+function updatePiggy(){document.getElementById('piggy-v').textContent='¥'+getCoins().toLocaleString();}
 
 const OP_NAMES={'+':'たし算','-':'ひき算','*':'かけ算','/':'わり算'};
 const LV_NAMES={1:'かんたん',2:'ふつう',3:'むずかしい'};
@@ -189,6 +214,7 @@ function fmtMs(ms){
 }
 
 function updateBestBar(){
+  updatePiggy();
   const b=getBest();
   const bar=document.getElementById('best-bar');
   document.getElementById('best-lbl').textContent=OP_NAMES[curOp]+' / '+LV_NAMES[curLv]+'　自己ベスト ⏱';
@@ -401,6 +427,15 @@ function showResult(elapsed,correct){
 
   const nb=getBest();
   document.getElementById('rb').textContent=nb>0?'自己ベスト：'+fmtMs(nb):'';
+
+  const total=addCoins(correct);
+  const earnEl=document.getElementById('coin-earn');
+  earnEl.style.animation='none';
+  earnEl.offsetHeight;
+  earnEl.style.animation='';
+  document.getElementById('coin-earn-num').textContent='＋'+correct+'円';
+  document.getElementById('coin-total').textContent='🐷 貯金箱：¥'+total.toLocaleString();
+  updatePiggy();
 
   document.getElementById('s-drill').classList.add('hidden');
   document.getElementById('s-result').classList.remove('hidden');
