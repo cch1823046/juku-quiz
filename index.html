@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>全科目チャレンジ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap">
+<style>
+:root{
+  --bg:#F0F4FF;--surface:#FFF;--s2:#F5F7FF;--border:#E0E7FF;
+  --text:#1E1B4B;--muted:#64748B;--shadow:0 3px 16px rgba(79,70,229,.09);--r:16px;
+  --math-c:#1D4ED8;--math-bg:#EFF6FF;--math-grd:linear-gradient(135deg,#60A5FA,#1D4ED8);
+  --sci-c:#15803D; --sci-bg:#F0FFF4;--sci-grd:linear-gradient(135deg,#4ADE80,#15803D);
+  --soc-c:#B45309; --soc-bg:#FFFBEB;--soc-grd:linear-gradient(135deg,#FCD34D,#B45309);
+  --eng-c:#7C3AED; --eng-bg:#FAF5FF;--eng-grd:linear-gradient(135deg,#C084FC,#7C3AED);
+  --jpn-c:#DC2626; --jpn-bg:#FFF5F5;--jpn-grd:linear-gradient(135deg,#F87171,#DC2626);
+  --ok:#16A34A;--ng:#DC2626;--gold:#D97706;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0C0F1E;--surface:#141828;--s2:#0F1322;--border:#252A45;
+  --text:#E8ECF8;--muted:#8B90B8;--shadow:0 3px 16px rgba(0,0,0,.45);
+  --math-bg:#0C1F40;--sci-bg:#0A2018;--soc-bg:#211400;--eng-bg:#1A0E38;--jpn-bg:#2D0A0A;
+}}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;background:var(--bg);color:var(--text);padding:0 16px;padding-block:20px 40px;max-width:520px;margin-inline:auto;}
+.hidden{display:none!important;}
+
+/* HOME */
+.h-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:4px;}
+.h-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;}
+.subj-grid{display:grid;gap:10px;margin-bottom:16px;}
+.subj-btn{border:none;border-radius:var(--r);padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:transform .12s;box-shadow:var(--shadow);}
+.subj-btn:active{transform:scale(.97);}
+.subj-ico{font-size:34px;line-height:1;flex-shrink:0;}
+.subj-name{font-size:18px;font-weight:800;color:#fff;margin-bottom:2px;}
+.subj-desc{font-size:11px;color:rgba(255,255,255,.8);}
+.subj-cnt{font-size:11px;color:rgba(255,255,255,.65);}
+.math{background:var(--math-grd);}.sci{background:var(--sci-grd);}.soc{background:var(--soc-grd);}.eng{background:var(--eng-grd);}.jpn{background:var(--jpn-grd);}
+.h-stats{background:var(--surface);border-radius:var(--r);padding:14px 20px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.hs-v{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gold);text-align:center;}
+.hs-l{font-size:11px;color:var(--muted);font-weight:700;text-align:center;}
+.upd-bar{background:var(--surface);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;gap:8px;}
+.upd-bar span{color:var(--muted);}
+.upd-btn{background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:6px 14px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+
+/* SETTINGS */
+.set-back{background:var(--surface);border:none;border-radius:10px;width:36px;height:36px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.set-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.set-head{font-size:20px;font-weight:800;}
+.card{background:var(--surface);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);margin-bottom:14px;}
+.card h3{font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;}
+.step{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--border);font-size:13px;line-height:1.6;}
+.step:first-of-type{border-top:none;padding-top:0;}
+.step-n{flex-shrink:0;width:24px;height:24px;border-radius:99px;background:var(--text);color:var(--bg);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.step b{font-weight:800;}
+.url-wrap{margin-top:14px;}
+.url-lbl{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px;}
+.url-inp{width:100%;background:var(--s2);border:2px solid var(--border);border-radius:10px;padding:11px 12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);outline:none;}
+.url-inp:focus{border-color:var(--math-c);}
+.load-btn{width:100%;background:linear-gradient(135deg,#4F46E5,#818CF8);border:none;border-radius:12px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;color:#fff;cursor:pointer;margin-top:10px;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.load-btn:hover{opacity:.88;}
+.load-btn:disabled{opacity:.5;cursor:not-allowed;}
+.status-msg{margin-top:10px;font-size:13px;font-weight:700;text-align:center;min-height:20px;}
+.status-ok{color:var(--ok);}.status-ng{color:var(--ng);}
+.hint-box{background:var(--s2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.65;margin-top:4px;}
+.hint-box b{color:var(--text);}
+.format-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+.format-tbl th,.format-tbl td{border:1px solid var(--border);padding:5px 7px;text-align:left;}
+.format-tbl th{background:var(--s2);font-weight:800;}
+.format-tbl td{font-family:monospace;font-size:11px;}
+.dl-btn{display:inline-block;background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:7px 16px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent;}
+
+/* LEVEL */
+.lv-back{background:var(--surface);border:none;border-radius:10px;width:36px;height:36px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.lv-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.lv-head{font-size:20px;font-weight:800;}
+.lv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;}
+.lv-btn{border:2.5px solid var(--border);background:var(--surface);border-radius:14px;padding:16px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);text-align:center;-webkit-tap-highlight-color:transparent;transition:all .15s;box-shadow:var(--shadow);}
+.lv-btn.sel{background:var(--text);color:var(--bg);border-color:var(--text);}
+.lv-btn.full{grid-column:1/-1;}
+.lv-desc{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;}
+.start-btn{width:100%;border:none;border-radius:14px;padding:16px;font-family:inherit;font-size:16px;font-weight:800;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s;box-shadow:var(--shadow);}
+
+/* QUIZ */
+.qz-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.qz-prog-wrap{flex:1;}
+.qz-pb{background:var(--border);border-radius:99px;height:8px;overflow:hidden;margin-bottom:4px;}
+.qz-pf{height:100%;border-radius:99px;transition:width .3s ease;}
+.qz-pt{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+.qz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.combo{display:flex;align-items:center;gap:4px;background:var(--surface);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:800;box-shadow:var(--shadow);font-variant-numeric:tabular-nums;}
+.combo.lit{color:var(--gold);}
+.q-card{background:var(--surface);border-radius:var(--r);padding:24px 20px;box-shadow:var(--shadow);text-align:center;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:14px;}
+.q-badge{font-size:11px;font-weight:800;letter-spacing:.08em;border-radius:99px;padding:3px 12px;margin-bottom:12px;}
+.q-text{font-size:19px;font-weight:800;line-height:1.5;text-wrap:balance;}
+.q-hint{font-size:12px;color:var(--muted);font-weight:700;margin-top:8px;}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.ch-btn{background:var(--surface);border:2.5px solid var(--border);border-radius:14px;padding:13px 8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;text-align:center;line-height:1.4;transition:all .15s;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;}
+.ch-btn.ok{background:var(--ok);border-color:var(--ok);color:#fff;}
+.ch-btn.ng{background:var(--ng);border-color:var(--ng);color:#fff;}
+.ch-btn.off{opacity:.4;cursor:default;}
+.fb{text-align:center;font-size:15px;font-weight:800;min-height:36px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.fb-ok{color:var(--ok);}.fb-ng{color:var(--ng);}
+.fb-note{font-size:12px;color:var(--muted);font-weight:700;text-align:center;margin-bottom:10px;line-height:1.55;min-height:18px;}
+.next-btn{width:100%;background:var(--text);border:none;border-radius:14px;padding:15px;font-family:inherit;font-size:15px;font-weight:800;color:var(--bg);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow);}
+
+/* RESULT */
+.res-hero{background:var(--surface);border-radius:var(--r);padding:28px 20px;box-shadow:var(--shadow);text-align:center;margin-bottom:14px;}
+.res-e{font-size:52px;display:block;margin-bottom:10px;}
+.res-msg{font-size:20px;font-weight:800;margin-bottom:6px;}
+.res-sub{font-size:13px;color:var(--muted);font-weight:700;}
+.res-sc{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums;margin:14px 0 2px;}
+.res-cor{font-size:14px;color:var(--muted);font-weight:700;}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.res-stat{background:var(--surface);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--shadow);}
+.rs-v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;}
+.rs-l{font-size:12px;color:var(--muted);font-weight:700;}
+.wrong-sec{background:var(--surface);border-radius:var(--r);padding:14px 18px;box-shadow:var(--shadow);margin-bottom:12px;}
+.wrong-ttl{font-size:13px;font-weight:800;margin-bottom:10px;}
+.w-item{padding:9px 0;border-top:1px solid var(--border);font-size:12px;line-height:1.5;}
+.w-item:first-child{border-top:none;}
+.w-q{font-weight:800;margin-bottom:2px;}
+.w-a{color:var(--ok);font-weight:700;}
+.btn-col{display:grid;gap:9px;}
+.p-btn{width:100%;border:none;border-radius:14px;padding:15px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s;box-shadow:var(--shadow);}
+.p-dark{background:var(--text);color:var(--bg);}
+.p-red{background:var(--ng);color:#fff;}
+.p-ghost{background:var(--surface);color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="s-home">
+  <div class="h-title">📚 全科目チャレンジ</div>
+  <div class="h-sub">低学年〜中高一貫校受験まで対応</div>
+  <div class="subj-grid">
+    <button class="subj-btn math" onclick="pickSubject('math')">
+      <div class="subj-ico">🔢</div>
+      <div><div class="subj-name">算数</div><div class="subj-desc">計算・割合・速さ・図形・文章題</div><div class="subj-cnt" id="cnt-math"></div></div>
+    </button>
+    <button class="subj-btn sci" onclick="pickSubject('sci')">
+      <div class="subj-ico">🔬</div>
+      <div><div class="subj-name">理科</div><div class="subj-desc">植物・動物・電気・天気・化学</div><div class="subj-cnt" id="cnt-sci"></div></div>
+    </button>
+    <button class="subj-btn soc" onclick="pickSubject('soc')">
+      <div class="subj-ico">🌍</div>
+      <div><div class="subj-name">社会</div><div class="subj-desc">地理・歴史・公民・地図</div><div class="subj-cnt" id="cnt-soc"></div></div>
+    </button>
+    <button class="subj-btn eng" onclick="pickSubject('eng')">
+      <div class="subj-ico">🇬🇧</div>
+      <div><div class="subj-name">英語</div><div class="subj-desc">英検5級→4級→3級レベル</div><div class="subj-cnt" id="cnt-eng"></div></div>
+    </button>
+    <button class="subj-btn jpn" onclick="pickSubject('jpn')">
+      <div class="subj-ico">📝</div>
+      <div><div class="subj-name">国語</div><div class="subj-desc">漢字・ことわざ・慣用句・語彙</div><div class="subj-cnt" id="cnt-jpn"></div></div>
+    </button>
+  </div>
+  <div class="h-stats">
+    <div><div class="hs-v" id="hs-t">0</div><div class="hs-l">総問題数</div></div>
+    <div><div class="hs-v" id="hs-c">0</div><div class="hs-l">正解数</div></div>
+    <div><div class="hs-v" id="hs-p">0</div><div class="hs-l">ポイント</div></div>
+  </div>
+  <div class="upd-bar">
+    <span id="upd-ts">問題データ: 初期データ</span>
+    <button class="upd-btn" onclick="openSettings()">⚙️ 問題を追加・更新</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="s-settings" class="hidden">
+  <div class="set-row">
+    <button class="set-back" onclick="goHome()">←</button>
+    <div class="set-head">⚙️ 問題データの更新</div>
+  </div>
+
+  <div class="card">
+    <h3>📋 手順</h3>
+    <div class="step"><div class="step-n">1</div><div>テンプレートのCSVファイルをダウンロードして <b>Googleスプレッドシート</b> または <b>Excel</b> で開く<br><button class="dl-btn" onclick="downloadTemplate()">📥 テンプレートをダウンロード</button></div></div>
+    <div class="step"><div class="step-n">2</div><div>問題を追加・編集する（<b>1行目の見出しは変えないこと！</b>）<br>科目は <b>math / sci / soc / eng / jpn</b> のいずれかを入力</div></div>
+    <div class="step"><div class="step-n">3</div><div>Googleスプレッドシートの場合：<b>ファイル → 共有 → ウェブに公開 → CSV</b> でURLを取得<br>または「公開CSVのURL」を下の欄に貼り付け</div></div>
+    <div class="step"><div class="step-n">4</div><div>「読み込む」ボタンを押す。問題が自動的に取り込まれる</div></div>
+  </div>
+
+  <div class="card">
+    <h3>📊 CSVの列の形式</h3>
+    <div class="hint-box">
+      <b>1列目: 科目</b> → math / sci / soc / eng / jpn<br>
+      <b>2列目: レベル</b> → 1（低学年）/ 2（高学年）/ 3（受験）<br>
+      <b>3列目: 問題文</b>（例: 7 × 8 = ?）<br>
+      <b>4列目: 正解</b>（例: 56）<br>
+      <b>5〜7列目: 間違いの選択肢</b>（3つ必要）<br>
+      <b>8列目: 解説メモ</b>（省略可）
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔗 Google スプレッドシートのURLを入力</h3>
+    <div class="url-wrap">
+      <div class="url-lbl">公開CSV URL を貼り付け</div>
+      <textarea class="url-inp" id="sheets-url" rows="3" placeholder="https://docs.google.com/spreadsheets/d/..."></textarea>
+    </div>
+    <button class="load-btn" id="load-btn" onclick="loadFromURL()">📥 問題を読み込む</button>
+    <div class="status-msg" id="load-status"></div>
+  </div>
+
+  <div class="card" style="background:var(--s2);">
+    <h3>ℹ️ URLの取得方法（Googleスプレッドシート）</h3>
+    <div class="hint-box">
+      1. スプレッドシートを開く<br>
+      2. メニュー: <b>ファイル → 共有 → ウェブに公開</b><br>
+      3. 「リンク」タブ → <b>「カンマ区切りの値（.csv）」</b> を選択<br>
+      4. 「公開」ボタンを押してURLをコピー<br>
+      5. 上の欄に貼り付けて「読み込む」を押す
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL -->
+<div id="s-lvl" class="hidden">
+  <div class="lv-row">
+    <button class="lv-back" onclick="goHome()">←</button>
+    <div class="lv-head" id="lv-head"></div>
+  </div>
+  <div class="lv-grid">
+    <button class="lv-btn" onclick="selectLv(1)"><div>⭐ レベル1</div><div class="lv-desc">低学年（小1〜3年）</div></button>
+    <button class="lv-btn" onclick="selectLv(2)"><div>⭐⭐ レベル2</div><div class="lv-desc">高学年（小4〜5年）</div></button>
+    <button class="lv-btn" onclick="selectLv(3)"><div>⭐⭐⭐ レベル3</div><div class="lv-desc">受験レベル（小6・入試）</div></button>
+    <button class="lv-btn full" onclick="selectLv(0)"><div>🎯 全レベルまとめて</div><div class="lv-desc">すべてのレベルからランダム出題</div></button>
+  </div>
+  <button class="start-btn hidden" id="start-btn" onclick="startQuiz()">クイズスタート！ →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="s-quiz" class="hidden">
+  <div class="qz-hdr">
+    <button class="lv-back" onclick="goHome()">←</button>
+    <div class="qz-prog-wrap">
+      <div class="qz-pb"><div class="qz-pf" id="qpf"></div></div>
+      <div class="qz-pt" id="qpt">1 / 10</div>
+    </div>
+  </div>
+  <div class="qz-meta">
+    <div class="combo" id="combo">🔥 コンボ <span id="combo-n">0</span></div>
+    <div style="font-size:14px;font-weight:800;color:var(--muted)">⭐ <span id="qz-sc">0</span> pt</div>
+  </div>
+  <div class="q-card">
+    <div class="q-badge" id="q-badge"></div>
+    <div id="q-main"></div>
+    <div class="q-hint" id="q-hint"></div>
+  </div>
+  <div class="choices" id="choices"></div>
+  <div class="fb" id="fb"></div>
+  <div class="fb-note" id="fb-note"></div>
+  <button class="next-btn hidden" id="next-btn" onclick="nextQ()">次の問題へ →</button>
+</div>
+
+<!-- RESULT -->
+<div id="s-res" class="hidden">
+  <div class="res-hero">
+    <span class="res-e" id="re"></span>
+    <div class="res-msg" id="rm"></div>
+    <div class="res-sub" id="rs"></div>
+    <div class="res-sc" id="rsc" style="color:var(--gold)"></div>
+    <div class="res-cor" id="rc"></div>
+  </div>
+  <div class="res-grid">
+    <div class="res-stat"><div class="rs-v" id="rmx">0</div><div class="rs-l">🔥 最大コンボ</div></div>
+    <div class="res-stat"><div class="rs-v" id="racc">0%</div><div class="rs-l">✅ 正答率</div></div>
+  </div>
+  <div class="wrong-sec" id="wsec"><div class="wrong-ttl">📌 間違えた問題（復習しよう！）</div><div id="wlist"></div></div>
+  <div class="btn-col">
+    <button class="p-btn p-dark" id="btn-retry">もう一度やる 🔄</button>
+    <button class="p-btn p-red hidden" id="btn-wrong">間違えた問題だけやり直す ❌→⭕</button>
+    <button class="p-btn p-ghost" onclick="goHome()">科目選択に戻る</button>
+  </div>
+</div>
+
+<script>
+/* ===== DEFAULT DATA (inline fallback) ===== */
+const DEFAULT_DATA={
+math:[
+  {q:'7 × 8 = ?',a:'56',w:['48','54','63'],lv:1},{q:'48 ÷ 6 = ?',a:'8',w:['6','7','9'],lv:1},
+  {q:'125 ÷ 5 = ?',a:'25',w:['20','30','22'],lv:1},{q:'100 − 37 = ?',a:'63',w:['73','53','67'],lv:1},
+  {q:'三角形の3つの角の和は？',a:'180°',w:['90°','270°','360°'],lv:1},{q:'四角形の4つの角の和は？',a:'360°',w:['180°','270°','540°'],lv:1},
+  {q:'1辺が6cmの正方形の面積は？',a:'36cm²',w:['24cm²','12cm²','30cm²'],lv:1},{q:'100円玉4枚＋50円玉3枚はいくら？',a:'550円',w:['450円','500円','600円'],lv:1},
+  {q:'3 × 4 + 5 × 2 = ?',a:'22',w:['34','17','24'],lv:1},{q:'1km = ?m',a:'1000m',w:['100m','10000m','500m'],lv:1},
+  {q:'3/4 + 1/4 = ?',a:'1',w:['4/8','2/3','7/8'],lv:2},{q:'底辺8cm・高さ5cmの三角形の面積は？',a:'20cm²',w:['40cm²','13cm²','25cm²'],lv:2},
+  {q:'0.6 × 0.5 = ?',a:'0.3',w:['0.03','3','0.11'],lv:2},{q:'4割5分を小数で表すと？',a:'0.45',w:['4.5','0.045','4.05'],lv:2},
+  {q:'12と18の最大公約数は？',a:'6',w:['3','4','9'],lv:2},{q:'速さ50km/h・2時間で走った距離は？',a:'100km',w:['50km','150km','25km'],lv:2},
+  {q:'定価1000円の3割引きの値段は？',a:'700円',w:['300円','800円','650円'],lv:2},{q:'直径10cmの円の円周は？（π=3.14）',a:'31.4cm',w:['15.7cm','78.5cm','62.8cm'],lv:2},
+  {q:'時速60kmで2時間30分走ると何km？',a:'150km',w:['120km','90km','180km'],lv:3,note:'2時間30分＝2.5時間'},{q:'12と18の最小公倍数は？',a:'36',w:['6','24','216'],lv:3},
+  {q:'3/5 × 5/9 = ?',a:'1/3',w:['3/45','8/45','2/9'],lv:3},{q:'定価2400円の2割5分引きの売値は？',a:'1800円',w:['1600円','2000円','1200円'],lv:3,note:'2400×0.75＝1800'},
+  {q:'1から100までの整数の和は？',a:'5050',w:['4950','5100','5000'],lv:3,note:'(1+100)×100÷2＝5050'},{q:'直径10cmの円の面積は？（π=3.14）',a:'78.5cm²',w:['31.4cm²','314cm²','157cm²'],lv:3},
+  {q:'食塩40gを水160gに溶かした食塩水の濃度は？',a:'20%',w:['25%','16%','40%'],lv:3,note:'40÷200＝0.2＝20%'},{q:'ある数の30%が24のとき、そのある数は？',a:'80',w:['72','7.2','240'],lv:3},
+],
+sci:[
+  {q:'カエルは何類に分類される？',a:'両生類',w:['は虫類','魚類','哺乳類'],lv:1},{q:'昆虫の足は何本？',a:'6本',w:['4本','8本','2本'],lv:1},
+  {q:'太陽が昇るのはどの方角？',a:'東',w:['西','南','北'],lv:1},{q:'水が凍る温度は？',a:'0℃',w:['-10℃','4℃','100℃'],lv:1},
+  {q:'水が沸騰する温度は？',a:'100℃',w:['60℃','80℃','120℃'],lv:1},{q:'空気中で最も多い気体は？',a:'窒素',w:['酸素','二酸化炭素','水素'],lv:1},
+  {q:'植物が光を使って栄養を作ることを何という？',a:'光合成',w:['呼吸','蒸散','発芽'],lv:1},{q:'チョウの変態の順は？',a:'卵→幼虫→さなぎ→成虫',w:['卵→さなぎ→幼虫→成虫','卵→成虫→幼虫→さなぎ','幼虫→卵→さなぎ→成虫'],lv:1},
+  {q:'光合成に必要な3つは？',a:'光・水・二酸化炭素',w:['光・水・酸素','水・空気・肥料','日光・二酸化炭素・土'],lv:2},{q:'血液の中で酸素を運ぶ成分は？',a:'赤血球',w:['白血球','血小板','血しょう'],lv:2},
+  {q:'水を電気分解すると生じる気体は？',a:'水素と酸素',w:['水素と塩素','酸素と窒素','水素と炭素'],lv:2},{q:'地球の表面の約何%が海？',a:'約70%',w:['約30%','約50%','約90%'],lv:2},
+  {q:'豆電球を直列につなぐと1個のときに比べて？',a:'暗くなる',w:['明るくなる','変わらない','全く光らない'],lv:2},{q:'地震の最初の小さな揺れを引き起こす波は？',a:'P波',w:['S波','断層波','余震波'],lv:2},
+  {q:'酸性のとき青リトマス紙はどうなる？',a:'赤色になる',w:['青のまま','黄色になる','緑になる'],lv:2},{q:'だ液が消化するものは？',a:'でんぷん',w:['たんぱく質','脂肪','糖分'],lv:3,note:'アミラーゼという酵素が含まれる'},
+  {q:'てこの力点が支点から2m・作用点1mで20kgを持ち上げる力は？',a:'10kg分の力',w:['20kg分の力','40kg分の力','5kg分の力'],lv:3,note:'力×距離が等しい。力×2＝20×1'},{q:'食塩水はリトマス紙で何性？',a:'中性',w:['酸性','アルカリ性','強酸性'],lv:3},
+  {q:'ものが燃えるために必要な3条件は？',a:'酸素・燃えるもの・発火点以上の温度',w:['酸素・熱・水','空気・燃えるもの・炭素','二酸化炭素・熱・燃えるもの'],lv:3},{q:'月が地球を一周する時間は？',a:'約1ヶ月（約30日）',w:['約1年','約1日','約1週間'],lv:3},
+],
+soc:[
+  {q:'日本の首都は？',a:'東京',w:['大阪','京都','奈良'],lv:1},{q:'日本で最も大きな島は？',a:'本州',w:['九州','北海道','四国'],lv:1},
+  {q:'日本の都道府県の数は？',a:'47',w:['46','48','50'],lv:1},{q:'日本で面積が最大の都道府県は？',a:'北海道',w:['岩手県','長野県','福島県'],lv:1},
+  {q:'日本の「国鳥」は？',a:'キジ',w:['ツル','タカ','スズメ'],lv:1},{q:'東京スカイツリーがある都道府県は？',a:'東京都',w:['神奈川県','埼玉県','千葉県'],lv:1},
+  {q:'江戸時代に政治を行っていた将軍の姓は？',a:'徳川',w:['豊臣','織田','源'],lv:2},{q:'聖徳太子が活躍した時代は？',a:'飛鳥時代',w:['奈良時代','平安時代','鎌倉時代'],lv:2},
+  {q:'源頼朝が開いた幕府の場所は？',a:'鎌倉',w:['京都','奈良','江戸'],lv:2},{q:'日本の法律を作る機関は？',a:'国会',w:['内閣','裁判所','警察庁'],lv:2},
+  {q:'江戸時代の身分制度を順番に並べると？',a:'士・農・工・商',w:['農・士・工・商','士・工・農・商','武・農・商・工'],lv:2},{q:'日本国憲法が公布された年は？',a:'1946年',w:['1945年','1947年','1948年'],lv:2},
+  {q:'大阪に「天下の台所」という名がついた理由は？',a:'全国の物資が集まる商業・流通の中心地だったから',w:['大阪城が日本一だったから','徳川家のお膝元だったから','米の生産量が日本一だったから'],lv:3},{q:'日清戦争後の下関条約で日本が得た地域は？',a:'台湾・遼東半島など',w:['朝鮮半島','沖縄','樺太'],lv:3},
+  {q:'衆議院と参議院の違いとして正しいのは？',a:'衆議院は任期が短く解散がある',w:['参議院の方が権限が強い','任期は同じ','参議院だけに解散がある'],lv:3},{q:'日本の食料自給率（カロリーベース）はおよそ？',a:'約40%',w:['約70%','約90%','約20%'],lv:3},
+  {q:'江戸時代の「参勤交代」の目的は？',a:'大名の経済力・軍事力を弱めるため',w:['大名が江戸で将軍を守るため','各地の情報を収集するため','大名の交流を促進するため'],lv:3},{q:'4大文明が発展した河川に含まれないのは？',a:'アマゾン川',w:['ナイル川','インダス川','黄河'],lv:3},
+],
+eng:[
+  {q:'"apple" の意味は？',a:'りんご',w:['みかん','ぶどう','もも'],lv:1},{q:'"big" の反対語は？',a:'small',w:['tall','fast','many'],lv:1},
+  {q:'英語で「ありがとう」は？',a:'Thank you',w:["I'm sorry","Excuse me","Hello"],lv:1},{q:'"What time is it?" の意味は？',a:'今何時ですか？',w:['どこですか？','何ですか？','だれですか？'],lv:1},
+  {q:'英語で「犬」は？',a:'dog',w:['cat','bird','pig'],lv:1},{q:'英語で月曜日は？',a:'Monday',w:['Sunday','Tuesday','Saturday'],lv:1},
+  {q:'"He is playing soccer." の意味は？',a:'彼はサッカーをしています',w:['彼はサッカーをしました','彼はサッカーをするでしょう','彼はサッカーが好きです'],lv:2},{q:'"Can you swim?" に「はい、できます」は？',a:'Yes, I can.',w:['Yes, I am.','Yes, I do.','Yes, I have.'],lv:2},
+  {q:'"I have never eaten sushi." の意味は？',a:'私は一度も寿司を食べたことがない',w:['私は寿司をよく食べる','私は寿司を食べたくない','私は今寿司を食べていない'],lv:2},{q:'"My sister is taller than me." の意味は？',a:'私の姉は私より背が高い',w:['私の姉は私と同じ身長','私は姉より背が高い','私の姉は背が高くない'],lv:2},
+  {q:'"She has been to Paris." の意味は？',a:'彼女はパリに行ったことがある',w:['彼女はパリにいます','彼女はパリに行きました','彼女はパリに行くつもりです'],lv:2},{q:'英語で「〜している間に」を表す単語は？',a:'while',w:['until','unless','although'],lv:2},
+  {q:'"I wish I could fly." の意味は？',a:'空を飛べたらいいのに（飛べない）',w:['私は飛ぶことができます','私は空を飛びたいです','私はよく空を飛んでいました'],lv:3},{q:'"The book was written by Soseki." を能動態にすると？',a:'Soseki wrote the book.',w:['The book writes Soseki.','Soseki was written the book.','The book is writing Soseki.'],lv:3},
+  {q:'"Although he was tired, he worked hard." の意味は？',a:'彼は疲れていたが一生懸命働いた',w:['疲れていたので働けなかった','疲れているときは働くべきだ','彼は疲れていないので働けた'],lv:3},{q:'"Have you finished your homework yet?" の意味は？',a:'もう宿題は終わりましたか？',w:['今宿題をしていますか？','宿題をしたことがありますか？','宿題はいつ終わりますか？'],lv:3},
+  {q:'"The more you practice, the better you get." の意味は？',a:'練習すればするほど、上手になる',w:['練習は少ないほど上手くなる','最初は難しいが後で楽になる','練習しても上手にならないこともある'],lv:3},{q:'"Would you mind opening the window?" の意味は？',a:'窓を開けていただけますか？',w:['窓を開けるつもりですか？','窓は開いていますか？','窓を開けないでください'],lv:3},
+],
+jpn:[
+  {q:'「学校」の読みは？',a:'がっこう',w:['まなびやこう','がくか','がっか'],lv:1},{q:'「図書館」の読みは？',a:'としょかん',w:['ずしょかん','としょうかん','としょかわ'],lv:1},
+  {q:'「動物園」の読みは？',a:'どうぶつえん',w:['どうものえん','どうぶつえい','とうぶつえん'],lv:1},{q:'「体育館」の読みは？',a:'たいいくかん',w:['たいかんいく','からだいくかん','たいいつかん'],lv:1},
+  {q:'「食堂」の読みは？',a:'しょくどう',w:['たべどう','しょくどく','しょくたん'],lv:1},{q:'「横断歩道」の読みは？',a:'おうだんほどう',w:['よこだんほどう','おうだんほろ','こうだんほどう'],lv:1},
+  {q:'「確認」の読みは？',a:'かくにん',w:['こうにん','かくみん','たしにん'],lv:2},{q:'「情報」の読みは？',a:'じょうほう',w:['じょほう','こころほう','なさけほう'],lv:2},
+  {q:'「急がば回れ」の意味は？',a:'急ぐときこそ安全な道を選ぶほうが早い',w:['急いで動けば必ず成功する','遠回りをすると時間がかかる','たくさん練習すれば速くなる'],lv:2},{q:'「石の上にも三年」の意味は？',a:'辛抱強く続ければ成果が出る',w:['3年たっても結果が出なければあきらめよ','岩のように固く信念を持て','最初の3年間が一番大切'],lv:2},
+  {q:'「百聞は一見に如かず」の意味は？',a:'何度も聞くより一度自分の目で見る方がよくわかる',w:['100人が言うことは必ず正しい','見ることより聞くことが大切','百回試みることが近道'],lv:2},{q:'「頭が切れる」の意味は？',a:'頭がよく物事の判断が速い',w:['頭をぶつけてケガをした','怒りやすい性格','髪の毛が切れやすい'],lv:2},
+  {q:'「二兎を追う者は一兎をも得ず」の意味は？',a:'欲張って二つ同時にやろうとするとどちらも失敗する',w:['二つの目標を持つと達成しやすい','うさぎを追うには速さが必要','並行して行うのが現代の常識'],lv:3},{q:'「棚からぼたもち」の意味は？',a:'思いがけなく幸運が転がり込んでくること',w:['努力すれば必ずよいことがある','準備していれば幸運が来る','食べ物は身近なところにある'],lv:3},
+  {q:'「水に流す」の意味は？',a:'過去のことをなかったことにして許すこと',w:['川や海に物を流すこと','水で汚れを洗い流すこと','水を無駄に使ってしまうこと'],lv:3},{q:'「油を売る」の意味は？',a:'仕事を怠けてよそで無駄話をすること',w:['石油を販売する仕事','油で料理をすること','機械に油をさすこと'],lv:3},
+]};
+
+/* ===== CSV TEMPLATE ===== */
+const TEMPLATE_CSV=`科目,レベル,問題文,正解,不正解1,不正解2,不正解3,メモ
+math,1,7 × 8 = ?,56,48,54,63,
+math,2,3/4 + 1/4 = ?,1,4/8,2/3,7/8,
+math,3,1から100までの整数の和は?,5050,4950,5100,5000,(1+100)×100÷2=5050
+sci,1,カエルは何類に分類される?,両生類,は虫類,魚類,哺乳類,
+sci,2,光合成に必要な3つは?,光・水・二酸化炭素,光・水・酸素,水・空気・肥料,日光・二酸化炭素・土,
+sci,3,だ液が消化するものは?,でんぷん,たんぱく質,脂肪,糖分,アミラーゼという酵素が含まれる
+soc,1,日本の首都は?,東京,大阪,京都,奈良,
+soc,2,源頼朝が開いた幕府の場所は?,鎌倉,京都,奈良,江戸,
+soc,3,大阪に「天下の台所」という名がついた理由は?,全国の物資が集まる商業・流通の中心地だったから,大阪城が日本一だったから,徳川家のお膝元だったから,米の生産量が日本一だったから,
+eng,1,\"apple\" の意味は?,りんご,みかん,ぶどう,もも,
+eng,2,\"He is playing soccer.\" の意味は?,彼はサッカーをしています,彼はサッカーをしました,彼はサッカーをするでしょう,彼はサッカーが好きです,
+eng,3,\"I wish I could fly.\" の意味は?,空を飛べたらいいのに（飛べない）,私は飛ぶことができます,私は空を飛びたいです,私はよく空を飛んでいました,
+jpn,1,「学校」の読みは?,がっこう,まなびやこう,がくか,がっか,
+jpn,2,「急がば回れ」の意味は?,急ぐときこそ安全な道を選ぶほうが早い,急いで動けば必ず成功する,遠回りをすると時間がかかる,たくさん練習すれば速くなる,
+jpn,3,「二兎を追う者は一兎をも得ず」の意味は?,欲張って二つ同時にやろうとするとどちらも失敗する,二つの目標を持つと達成しやすい,うさぎを追うには速さが必要,並行して行うのが現代の常識,`;
+
+/* ===== META ===== */
+const META={
+  math:{name:'算数',icon:'🔢',c:'var(--math-c)',bg:'var(--math-bg)',grd:'var(--math-grd)'},
+  sci: {name:'理科',icon:'🔬',c:'var(--sci-c)', bg:'var(--sci-bg)', grd:'var(--sci-grd)'},
+  soc: {name:'社会',icon:'🌍',c:'var(--soc-c)', bg:'var(--soc-bg)', grd:'var(--soc-grd)'},
+  eng: {name:'英語',icon:'🇬🇧',c:'var(--eng-c)',bg:'var(--eng-bg)',grd:'var(--eng-grd)'},
+  jpn: {name:'国語',icon:'📝',c:'var(--jpn-c)',bg:'var(--jpn-bg)',grd:'var(--jpn-grd)'},
+};
+
+/* ===== STATE ===== */
+const LS_STATS='juku-all-stats';
+const LS_DATA='juku-extra-data';
+const LS_URL='juku-sheets-url';
+const LS_TS='juku-data-ts';
+
+let stats={};try{stats=JSON.parse(localStorage.getItem(LS_STATS)||'{}')}catch{}
+function saveStats(){try{localStorage.setItem(LS_STATS,JSON.stringify(stats))}catch{}}
+
+// Merge loaded data into default
+let EXTRA={};
+try{EXTRA=JSON.parse(localStorage.getItem(LS_DATA)||'{}')}catch{}
+
+function mergedData(){
+  const d={};
+  Object.keys(META).forEach(k=>{
+    d[k]=[...(DEFAULT_DATA[k]||[]),...(EXTRA[k]||[])];
+  });
+  return d;
+}
+
+let curSubj=null,curLv=0,queue=[],qi=0,combo=0,maxCombo=0,score=0,correct=0,wrongs=[];
+let answered=false;
+
+/* ===== CSV PARSER ===== */
+function parseCSV(text){
+  const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  const result={};
+  let header=null;
+  for(const raw of lines){
+    if(!raw.trim())continue;
+    const cols=splitCSVRow(raw);
+    if(!header){header=cols;continue;}
+    const row={};
+    header.forEach((h,i)=>row[h.trim()]=cols[i]||'');
+    const subj=(row['科目']||'').trim();
+    const lv=parseInt(row['レベル'])||1;
+    const q=(row['問題文']||'').trim();
+    const a=(row['正解']||'').trim();
+    const w=[row['不正解1'],row['不正解2'],row['不正解3']].map(s=>(s||'').trim()).filter(Boolean);
+    const note=(row['メモ']||'').trim();
+    if(!subj||!q||!a||w.length<3)continue;
+    if(!Object.keys(META).includes(subj))continue;
+    if(!result[subj])result[subj]=[];
+    result[subj].push({q,a,w,lv,note});
+  }
+  return result;
+}
+
+function splitCSVRow(row){
+  const out=[];let cur='';let inQ=false;
+  for(let i=0;i<row.length;i++){
+    const c=row[i];
+    if(c==='"'){inQ=!inQ;}
+    else if(c===','&&!inQ){out.push(cur);cur='';}
+    else cur+=c;
+  }
+  out.push(cur);
+  return out;
+}
+
+/* ===== DOWNLOAD TEMPLATE ===== */
+function downloadTemplate(){
+  const blob=new Blob(['﻿'+TEMPLATE_CSV],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='juku-quiz-template.csv';
+  a.click();
+}
+
+/* ===== LOAD FROM URL ===== */
+async function loadFromURL(){
+  const rawUrl=document.getElementById('sheets-url').value.trim();
+  if(!rawUrl){setStatus('URLを入力してください','ng');return;}
+
+  // Convert Google Sheets edit URL to CSV export URL
+  let url=rawUrl;
+  if(url.includes('docs.google.com/spreadsheets')&&!url.includes('export?format=csv')){
+    const match=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    const gidMatch=url.match(/gid=(\d+)/);
+    if(match){
+      const id=match[1];
+      const gid=gidMatch?gidMatch[1]:'0';
+      url=`https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
+    }
+  }
+
+  const btn=document.getElementById('load-btn');
+  btn.disabled=true;btn.textContent='読み込み中…';
+  setStatus('接続中…','');
+
+  try{
+    const res=await fetch(url,{cache:'no-cache'});
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const text=await res.text();
+    const parsed=parseCSV(text);
+    const total=Object.values(parsed).reduce((s,a)=>s+a.length,0);
+    if(total===0)throw new Error('問題が見つかりませんでした。列の形式を確認してください');
+    EXTRA=parsed;
+    try{localStorage.setItem(LS_DATA,JSON.stringify(EXTRA));}catch{}
+    try{localStorage.setItem(LS_URL,rawUrl);}catch{}
+    const ts=new Date().toLocaleString('ja-JP');
+    try{localStorage.setItem(LS_TS,ts);}catch{}
+    setStatus(`✅ ${total}問を読み込みました！（${ts}）`,'ok');
+    document.getElementById('upd-ts').textContent=`最終更新: ${ts}`;
+    setTimeout(()=>goHome(),1500);
+  }catch(e){
+    setStatus('❌ 読み込みに失敗しました: '+e.message,'ng');
+  }finally{
+    btn.disabled=false;btn.textContent='📥 問題を読み込む';
+  }
+}
+
+function setStatus(msg,type){
+  const el=document.getElementById('load-status');
+  el.textContent=msg;
+  el.className='status-msg'+(type==='ok'?' status-ok':type==='ng'?' status-ng':'');
+}
+
+/* ===== HOME ===== */
+function goHome(){
+  const d=mergedData();
+  Object.keys(META).forEach(k=>{
+    document.getElementById('cnt-'+k).textContent=d[k].length+'問収録';
+  });
+  const s=Object.values(stats);
+  document.getElementById('hs-t').textContent=s.reduce((a,v)=>a+(v.total||0),0);
+  document.getElementById('hs-c').textContent=s.reduce((a,v)=>a+(v.correct||0),0);
+  document.getElementById('hs-p').textContent=s.reduce((a,v)=>a+(v.pts||0),0);
+  const ts=localStorage.getItem(LS_TS)||'初期データ';
+  document.getElementById('upd-ts').textContent=`最終更新: ${ts}`;
+  show('s-home');hide('s-settings');hide('s-lvl');hide('s-quiz');hide('s-res');
+}
+
+function openSettings(){
+  const saved=localStorage.getItem(LS_URL)||'';
+  if(saved)document.getElementById('sheets-url').value=saved;
+  setStatus('','');
+  hide('s-home');show('s-settings');hide('s-lvl');hide('s-quiz');hide('s-res');
+}
+
+/* ===== LEVEL ===== */
+function pickSubject(k){
+  curSubj=k;curLv=0;
+  const m=META[k];
+  document.getElementById('lv-head').textContent=m.icon+' '+m.name;
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('sel'));
+  hide('start-btn');
+  hide('s-home');hide('s-settings');show('s-lvl');hide('s-quiz');hide('s-res');
+}
+
+function selectLv(lv){
+  curLv=lv;
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+  show('start-btn');
+  document.getElementById('start-btn').style.background=META[curSubj].grd;
+}
+
+/* ===== QUIZ ===== */
+const Q_N=10;
+function startQuiz(){
+  const d=mergedData();
+  const pool=curLv===0?d[curSubj]:d[curSubj].filter(q=>q.lv===curLv);
+  if(pool.length===0){alert('この科目・レベルの問題がありません');return;}
+  queue=shuffle([...pool]).slice(0,Q_N);
+  qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hide('s-home');hide('s-settings');hide('s-lvl');show('s-quiz');hide('s-res');
+  renderQ();
+}
+
+function renderQ(){
+  answered=false;
+  const card=queue[qi];
+  const m=META[curSubj];
+  const pct=(qi/queue.length)*100;
+  const pf=document.getElementById('qpf');
+  pf.style.width=pct+'%';pf.style.background=m.grd;
+  document.getElementById('qpt').textContent=(qi+1)+' / '+queue.length;
+  const cb=document.getElementById('combo');
+  cb.className='combo'+(combo>=3?' lit':'');
+  document.getElementById('combo-n').textContent=combo;
+  document.getElementById('qz-sc').textContent=score;
+  const badge=document.getElementById('q-badge');
+  badge.textContent=m.icon+' '+m.name+' Lv'+(curLv||'?');
+  badge.style.background=m.bg;badge.style.color=m.c;
+  document.getElementById('q-main').innerHTML='<div class="q-text">'+esc(card.q)+'</div>';
+  document.getElementById('q-hint').textContent='正しい答えを1つ選ぼう';
+  const opts=shuffle([{t:card.a,ok:true},...card.w.map(t=>({t,ok:false}))]);
+  const ch=document.getElementById('choices');ch.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='ch-btn';b.textContent=opt.t;
+    b.addEventListener('click',()=>answer(opt.ok,card,b,ch));
+    ch.appendChild(b);
+  });
+  document.getElementById('fb').innerHTML='';
+  document.getElementById('fb-note').textContent='';
+  hide('next-btn');
+}
+
+function answer(ok,card,btn,ch){
+  if(answered)return;answered=true;
+  ch.querySelectorAll('.ch-btn').forEach(b=>{
+    b.classList.add('off');
+    if(b.textContent===card.a)b.classList.add('ok');
+  });
+  if(ok){
+    btn.classList.add('ok');btn.classList.remove('off');
+    combo++;if(combo>maxCombo)maxCombo=combo;
+    const bonus=Math.min(combo-1,5)*2;const gain=10+bonus;score+=gain;correct++;
+    document.getElementById('fb').innerHTML='<span class="fb-ok">⭕ 正解！'+(bonus>0?' +'+gain+'pt コンボ！':'')+'</span>';
+    document.getElementById('fb-note').textContent=card.note?'解説：'+card.note:'';
+  }else{
+    btn.classList.add('ng');btn.classList.remove('off');combo=0;
+    document.getElementById('fb').innerHTML='<span class="fb-ng">❌ 不正解</span>';
+    document.getElementById('fb-note').textContent='正解：'+card.a+(card.note?' ／ '+card.note:'');
+    wrongs.push(card);
+  }
+  document.getElementById('combo-n').textContent=combo;
+  document.getElementById('qz-sc').textContent=score;
+  const nb=document.getElementById('next-btn');
+  nb.textContent=qi<queue.length-1?'次の問題へ →':'結果を見る 🎉';
+  show('next-btn');
+}
+
+function nextQ(){qi++;if(qi>=queue.length){showResult();return;}renderQ();}
+
+/* ===== RESULT ===== */
+function showResult(){
+  hide('s-quiz');show('s-res');
+  const tot=queue.length,acc=Math.round(correct/tot*100);
+  if(!stats[curSubj])stats[curSubj]={total:0,correct:0,pts:0};
+  stats[curSubj].total+=tot;stats[curSubj].correct+=correct;stats[curSubj].pts+=score;
+  saveStats();
+  const tbl=[[100,'🏆','パーフェクト！最高だ！','全問正解！すごい！'],[80,'🎉','とてもよくできました！','あと少しで完璧！'],[60,'😊','よくできました！','間違えた問題を復習しよう'],[40,'💪','もう少し！がんばろう！','間違いをしっかり復習しよう'],[0,'📖','もう一度チャレンジ！','復習してから再挑戦しよう']];
+  const row=tbl.find(r=>acc>=r[0]);
+  document.getElementById('re').textContent=row[1];
+  document.getElementById('rm').textContent=row[2];
+  document.getElementById('rs').textContent=row[3];
+  document.getElementById('rsc').textContent=score+' pt';
+  document.getElementById('rc').textContent=correct+' / '+tot+' 問正解';
+  document.getElementById('rmx').textContent=maxCombo;
+  document.getElementById('racc').textContent=acc+'%';
+  const wl=document.getElementById('wlist'),ws=document.getElementById('wsec');
+  if(wrongs.length===0){ws.style.display='none';}else{
+    ws.style.display='';
+    wl.innerHTML=wrongs.map(c=>`<div class="w-item"><div class="w-q">「${esc(c.q)}」</div><div class="w-a">正解：${esc(c.a)}</div></div>`).join('');
+  }
+  document.getElementById('btn-retry').onclick=()=>startQuiz();
+  const bw=document.getElementById('btn-wrong');
+  if(wrongs.length>0){show('btn-wrong');bw.onclick=()=>startRetry([...wrongs]);}else hide('btn-wrong');
+}
+
+function startRetry(cards){
+  queue=shuffle(cards);qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hide('s-res');show('s-quiz');renderQ();
+}
+
+/* ===== UTILS ===== */
+function show(id){document.getElementById(id).classList.remove('hidden');}
+function hide(id){document.getElementById(id).classList.add('hidden');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+goHome();
+</script>
+</body>
+</html>
