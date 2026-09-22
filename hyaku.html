@@ -92,13 +92,23 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 .coin-total{font-size:13px;font-weight:800;color:#78350F;margin-top:8px;}
 .piggy-bar{background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:2px solid #FCD34D;border-radius:12px;padding:11px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);}
 .piggy-lbl{font-size:12px;font-weight:800;color:#92400E;}
+.piggy-name{font-size:11px;font-weight:700;color:#B45309;margin-left:6px;}
 .piggy-v{font-size:22px;font-weight:900;color:#B45309;font-variant-numeric:tabular-nums;}
+.piggy-edit{background:none;border:none;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;-webkit-tap-highlight-color:transparent;}
 @keyframes coinpop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
 .coin-earn{animation:coinpop .35s ease;}
 .retry-btn{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED);border:none;border-radius:14px;padding:16px;font-family:inherit;font-size:16px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(79,70,229,.3);margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
 .home-btn2{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
 .shake{animation:shake .3s ease;}
+/* NAME OVERLAY */
+.name-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.name-box{background:var(--surface);border-radius:20px;padding:28px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.3);}
+.name-title{font-size:22px;font-weight:900;margin-bottom:8px;}
+.name-sub{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px;line-height:1.7;}
+.name-inp{width:100%;border:2px solid var(--border);border-radius:12px;padding:14px;font-family:inherit;font-size:18px;font-weight:800;text-align:center;background:var(--surface);color:var(--text);outline:none;margin-bottom:14px;display:block;}
+.name-inp:focus{border-color:var(--accent);}
+.name-ok{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED);border:none;border-radius:12px;padding:14px;font-family:inherit;font-size:16px;font-weight:900;color:#fff;cursor:pointer;}
 </style>
 
 <!-- HOME -->
@@ -107,8 +117,11 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
   <p class="h-sub">タイマーで自己ベストに挑戦！</p>
 
   <div class="piggy-bar" id="piggy-bar">
-    <span class="piggy-lbl">🐷 貯金箱</span>
-    <span class="piggy-v" id="piggy-v">¥0</span>
+    <div><span class="piggy-lbl">🐷 貯金箱</span><span class="piggy-name" id="piggy-name"></span></div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span class="piggy-v" id="piggy-v">¥…</span>
+      <button class="piggy-edit" onclick="openNameOverlay()" title="なまえをかえる">✏️</button>
+    </div>
   </div>
 
   <div id="best-bar" class="best-bar hidden">
@@ -171,6 +184,16 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
   </div>
 </div>
 
+<!-- NAME OVERLAY -->
+<div id="name-overlay" class="name-overlay hidden">
+  <div class="name-box">
+    <p class="name-title">🐷 なまえを入れてね</p>
+    <p class="name-sub">どの端末でも同じなまえを使うと<br>貯金箱が引き継がれるよ！</p>
+    <input id="name-inp" class="name-inp" type="text" placeholder="例：たろう" maxlength="10" inputmode="text">
+    <button class="name-ok" onclick="saveName()">決定！</button>
+  </div>
+</div>
+
 <!-- RESULT -->
 <div id="s-result" class="screen hidden">
   <div class="rw">
@@ -192,14 +215,73 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 <script>
 const LS='hyaku-best';
 const LS_COIN='hyaku-coin';
+const LS_NAME='hyaku-name';
+const FORM_ID='1FAIpQLSdaR4WyDf1Cg2Hsm8IN0J5eGMzkPr-YEjrBU_FFedlMxgybHg';
+const FORM_SUBMIT='https://docs.google.com/forms/d/e/'+FORM_ID+'/formResponse';
+const ENTRY_NAME='entry.511947656';
+const ENTRY_POINTS='entry.1854139235';
 let curOp='+', curLv=1;
 let rowNums=[], colNums=[];
 let timerInt=null, startMs=0;
 let isChecked=false;
 
 function getCoins(){try{return parseInt(localStorage.getItem(LS_COIN))||0;}catch{return 0;}}
-function addCoins(n){try{const v=getCoins()+n;localStorage.setItem(LS_COIN,v);return v;}catch{return n;}}
-function updatePiggy(){document.getElementById('piggy-v').textContent='¥'+getCoins().toLocaleString();}
+function setCoinsLocal(n){try{localStorage.setItem(LS_COIN,n);}catch{}}
+function getName(){try{return localStorage.getItem(LS_NAME)||'';}catch{return '';}}
+function setName(n){try{localStorage.setItem(LS_NAME,n);}catch{}}
+
+async function submitToForm(name,points){
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action=FORM_SUBMIT;
+  form.style.display='none';
+  const inp1=document.createElement('input');
+  inp1.name=ENTRY_NAME;
+  inp1.value=name;
+  form.appendChild(inp1);
+  const inp2=document.createElement('input');
+  inp2.name=ENTRY_POINTS;
+  inp2.value=points;
+  form.appendChild(inp2);
+  document.body.appendChild(form);
+  try{form.submit();}catch{}
+  setTimeout(()=>form.remove(),1000);
+}
+
+async function fetchBalance(){
+  return getCoins();
+}
+
+async function earnCoins(delta){
+  const name=getName();
+  const v=getCoins()+delta;
+  setCoinsLocal(v);
+  if(name){
+    await submitToForm(name,delta);
+  }
+  return v;
+}
+
+async function updatePiggy(){
+  const bal=await fetchBalance();
+  document.getElementById('piggy-v').textContent='¥'+bal.toLocaleString();
+  const n=getName();
+  document.getElementById('piggy-name').textContent=n?'（'+n+'）':'';
+}
+
+function openNameOverlay(){
+  const ov=document.getElementById('name-overlay');
+  document.getElementById('name-inp').value=getName();
+  ov.classList.remove('hidden');
+  setTimeout(()=>document.getElementById('name-inp').focus(),100);
+}
+async function saveName(){
+  const v=document.getElementById('name-inp').value.trim();
+  if(!v)return;
+  setName(v);
+  document.getElementById('name-overlay').classList.add('hidden');
+  await updatePiggy();
+}
 
 const OP_NAMES={'+':'たし算','-':'ひき算','*':'かけ算','/':'わり算'};
 const LV_NAMES={1:'かんたん',2:'ふつう',3:'むずかしい'};
@@ -403,10 +485,10 @@ function checkAnswers(){
       setTimeout(()=>inp.classList.remove('shake'),400);
     }
   });
-  showResult(elapsed,correct);
+  await showResult(elapsed,correct);
 }
 
-function showResult(elapsed,correct){
+async function showResult(elapsed,correct){
   const b=getBest();
   const isNew=(b===0||elapsed<b)&&correct===100;
   if(isNew) setBest(elapsed);
@@ -428,14 +510,14 @@ function showResult(elapsed,correct){
   const nb=getBest();
   document.getElementById('rb').textContent=nb>0?'自己ベスト：'+fmtMs(nb):'';
 
-  const total=addCoins(correct);
+  const total=await earnCoins(correct);
   const earnEl=document.getElementById('coin-earn');
   earnEl.style.animation='none';
   earnEl.offsetHeight;
   earnEl.style.animation='';
   document.getElementById('coin-earn-num').textContent='＋'+correct+'円';
   document.getElementById('coin-total').textContent='🐷 貯金箱：¥'+total.toLocaleString();
-  updatePiggy();
+  await updatePiggy();
 
   document.getElementById('s-drill').classList.add('hidden');
   document.getElementById('s-result').classList.remove('hidden');
