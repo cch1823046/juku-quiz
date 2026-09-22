@@ -44,6 +44,30 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
 .upd-bar span{color:var(--muted);}
 .upd-btn{background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:6px 14px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
 
+/* WRONG BANK BUTTON */
+.wb-btn{width:100%;border:none;border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .12s;box-shadow:var(--shadow);background:linear-gradient(135deg,#F97316,#DC2626);margin-bottom:10px;}
+.wb-btn:active{transform:scale(.97);}
+.wb-left{display:flex;align-items:center;gap:12px;}
+.wb-ico{font-size:30px;}
+.wb-name{font-size:17px;font-weight:800;color:#fff;margin-bottom:2px;}
+.wb-sub{font-size:12px;color:rgba(255,255,255,.85);}
+.wb-badge{background:rgba(255,255,255,.25);color:#fff;border-radius:99px;padding:6px 14px;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;}
+.parent-row{display:flex;justify-content:flex-end;margin-bottom:14px;}
+.parent-btn{background:none;border:none;font-family:inherit;font-size:12px;color:var(--muted);font-weight:700;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;}
+
+/* PARENT PANEL */
+.par-item{background:var(--surface);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;}
+.par-body{flex:1;min-width:0;}
+.par-q{font-size:13px;font-weight:800;margin-bottom:4px;line-height:1.45;}
+.par-a{font-size:12px;color:var(--ok);font-weight:700;margin-bottom:4px;}
+.par-meta{font-size:11px;color:var(--muted);font-weight:700;display:flex;flex-wrap:wrap;gap:6px;}
+.par-del{flex-shrink:0;background:var(--ng);color:#fff;border:none;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.par-chip{font-size:11px;font-weight:700;border-radius:99px;padding:2px 8px;}
+.par-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;font-weight:700;}
+.danger-btn{width:100%;background:var(--s2);border:none;border-radius:12px;padding:13px;font-family:inherit;font-size:14px;font-weight:800;color:var(--ng);cursor:pointer;box-shadow:var(--shadow);margin-bottom:8px;-webkit-tap-highlight-color:transparent;}
+/* WRONG MODE indicator */
+.wm-bar{background:linear-gradient(90deg,#F97316,#DC2626);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;color:#fff;text-align:center;margin-bottom:10px;}
+
 /* SETTINGS */
 .set-back{background:var(--surface);border:none;border-radius:10px;width:36px;height:36px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 .set-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
@@ -162,10 +186,18 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <div><div class="hs-v" id="hs-c">0</div><div class="hs-l">正解数</div></div>
     <div><div class="hs-v" id="hs-p">0</div><div class="hs-l">ポイント</div></div>
   </div>
+  <button class="wb-btn hidden" id="wb-btn" onclick="startWrongMode()">
+    <div class="wb-left">
+      <div class="wb-ico">🎯</div>
+      <div><div class="wb-name">苦手問題に挑戦！</div><div class="wb-sub">3回連続正解で卒業 🎓</div></div>
+    </div>
+    <div class="wb-badge" id="wb-count">0</div>
+  </button>
   <div class="upd-bar">
     <span id="upd-ts">問題データ: 初期データ</span>
     <button class="upd-btn" onclick="openSettings()">⚙️ 問題を追加・更新</button>
   </div>
+  <div class="parent-row"><button class="parent-btn" onclick="openParent()">👩‍👧 保護者メニュー</button></div>
 </div>
 
 <!-- SETTINGS -->
@@ -217,6 +249,21 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
   </div>
 </div>
 
+<!-- PARENT PANEL -->
+<div id="s-parent" class="hidden">
+  <div class="set-row">
+    <button class="set-back" onclick="goHome()">←</button>
+    <div class="set-head">👩‍👧 保護者メニュー</div>
+  </div>
+  <div class="card">
+    <h3 id="par-ttl">苦手問題 一覧</h3>
+    <div id="par-list"></div>
+  </div>
+  <button class="load-btn" onclick="exportWrongCSV()" style="margin-bottom:10px">📥 苦手問題をCSVでダウンロード</button>
+  <button class="danger-btn" onclick="clearAllWrongs()">🗑️ 全部リセット（苦手リストを空にする）</button>
+  <button class="p-btn p-ghost" style="margin-top:6px" onclick="goHome()">ホームに戻る</button>
+</div>
+
 <!-- LEVEL -->
 <div id="s-lvl" class="hidden">
   <div class="lv-row">
@@ -241,6 +288,7 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
       <div class="qz-pt" id="qpt">1 / 10</div>
     </div>
   </div>
+  <div class="wm-bar hidden" id="wm-bar">🎯 苦手問題モード ― 3回連続正解で卒業！</div>
   <div class="qz-meta">
     <div class="combo" id="combo">🔥 コンボ <span id="combo-n">0</span></div>
     <div style="font-size:14px;font-weight:800;color:var(--muted)">⭐ <span id="qz-sc">0</span> pt</div>
@@ -372,6 +420,112 @@ const LS_STATS='juku-all-stats';
 const LS_DATA='juku-extra-data';
 const LS_URL='juku-sheets-url';
 const LS_TS='juku-data-ts';
+const LS_WRONGS='juku-wrong-bank';
+
+/* ===== WRONG BANK ===== */
+function loadBank(){try{return JSON.parse(localStorage.getItem(LS_WRONGS)||'{}')}catch{return{};}}
+function saveBank(b){try{localStorage.setItem(LS_WRONGS,JSON.stringify(b))}catch{}}
+function bankKey(card,subj){return (subj||card.s||'?')+'§'+card.q.substring(0,40);}
+
+function recordWrong(card,subj){
+  const k=bankKey(card,subj);
+  const b=loadBank();
+  if(!b[k])b[k]={...card,s:subj,count:0,streak:0,lastDate:''};
+  b[k].count++;b[k].streak=0;b[k].lastDate=new Date().toLocaleDateString('ja-JP');
+  saveBank(b);updateWrongBadge();
+}
+
+function recordCorrectBank(card,subj){
+  const k=bankKey(card,subj);
+  const b=loadBank();
+  if(!b[k])return false;
+  b[k].streak=(b[k].streak||0)+1;
+  if(b[k].streak>=3){delete b[k];saveBank(b);updateWrongBadge();return true;}
+  saveBank(b);return false;
+}
+
+function updateWrongBadge(){
+  const n=Object.keys(loadBank()).length;
+  const btn=document.getElementById('wb-btn');
+  const cnt=document.getElementById('wb-count');
+  if(btn){btn.classList.toggle('hidden',n===0);}
+  if(cnt)cnt.textContent=n+'問';
+}
+
+/* ===== WRONG MODE ===== */
+let isWrongMode=false;
+let graduatedCount=0;
+
+function startWrongMode(){
+  const b=loadBank();
+  const pool=Object.values(b);
+  if(pool.length===0){alert('苦手問題がありません！通常クイズをやって苦手を貯めよう');return;}
+  isWrongMode=true;curSubj=null;curLv=0;graduatedCount=0;
+  queue=shuffle([...pool]).slice(0,Math.min(10,pool.length));
+  qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hideAll();show('s-quiz');
+  document.getElementById('wm-bar').classList.remove('hidden');
+  renderQ();
+}
+
+/* ===== PARENT PANEL ===== */
+function openParent(){
+  const b=loadBank();
+  const list=document.getElementById('par-list');
+  const keys=Object.keys(b);
+  document.getElementById('par-ttl').textContent='苦手問題 一覧（'+keys.length+'問）';
+  if(keys.length===0){
+    list.innerHTML='<div class="par-empty">🎉 苦手問題なし！<br>すごい！よく覚えています</div>';
+  } else {
+    const sorted=keys.slice().sort((a,b2)=>b[b2].count-b[a].count);
+    list.innerHTML=sorted.map(k=>{
+      const c=b[k];
+      const m=META[c.s]||{name:c.s,c:'var(--muted)',bg:'var(--border)',icon:'❓'};
+      const streakBar=c.streak>0?`${'⭐'.repeat(c.streak)}${c.streak}/3連続正解`:'まだ正解なし';
+      return `<div class="par-item">
+        <div class="par-body">
+          <div class="par-meta">
+            <span class="par-chip" style="color:${m.c};background:${m.bg}">${m.icon} ${m.name}</span>
+            <span>間違い ${c.count}回</span>
+            <span>${streakBar}</span>
+            <span>${c.lastDate||''}</span>
+          </div>
+          <div class="par-q">${esc(c.q)}</div>
+          <div class="par-a">正解: ${esc(c.a)}</div>
+        </div>
+        <button class="par-del" onclick="deleteWrong('${k.replace(/'/g,"\\'")}')">✕</button>
+      </div>`;
+    }).join('');
+  }
+  hideAll();show('s-parent');
+}
+
+function deleteWrong(k){
+  const b=loadBank();delete b[k];saveBank(b);
+  updateWrongBadge();openParent();
+}
+
+function clearAllWrongs(){
+  if(!confirm('苦手リストを全部リセットしますか？'))return;
+  try{localStorage.removeItem(LS_WRONGS)}catch{}
+  updateWrongBadge();openParent();
+}
+
+function exportWrongCSV(){
+  const b=loadBank();
+  const keys=Object.keys(b);
+  if(keys.length===0){alert('苦手問題がありません');return;}
+  const rows=['科目,レベル,問題文,正解,不正解1,不正解2,不正解3,メモ,間違い回数'];
+  keys.forEach(k=>{
+    const c=b[k];
+    const csvEsc=s=>'"'+String(s||'').replace(/"/g,'""')+'"';
+    rows.push([c.s,c.lv||1,c.q,c.a,...(c.w||['','','']).slice(0,3),c.note||'',c.count||1].map(csvEsc).join(','));
+  });
+  const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='juku-wrong-questions.csv';a.click();
+}
 
 let stats={};try{stats=JSON.parse(localStorage.getItem(LS_STATS)||'{}')}catch{}
 function saveStats(){try{localStorage.setItem(LS_STATS,JSON.stringify(stats))}catch{}}
@@ -488,6 +642,8 @@ function setStatus(msg,type){
 
 /* ===== HOME ===== */
 function goHome(){
+  isWrongMode=false;graduatedCount=0;
+  document.getElementById('wm-bar').classList.add('hidden');
   const d=mergedData();
   Object.keys(META).forEach(k=>{
     document.getElementById('cnt-'+k).textContent=d[k].length+'問収録';
@@ -498,7 +654,8 @@ function goHome(){
   document.getElementById('hs-p').textContent=s.reduce((a,v)=>a+(v.pts||0),0);
   const ts=localStorage.getItem(LS_TS)||'初期データ';
   document.getElementById('upd-ts').textContent=`最終更新: ${ts}`;
-  show('s-home');hide('s-settings');hide('s-lvl');hide('s-quiz');hide('s-res');
+  updateWrongBadge();
+  hideAll();show('s-home');
 }
 
 function openSettings(){
@@ -529,19 +686,20 @@ function selectLv(lv){
 /* ===== QUIZ ===== */
 const Q_N=10;
 function startQuiz(){
+  isWrongMode=false;graduatedCount=0;
   const d=mergedData();
   const pool=curLv===0?d[curSubj]:d[curSubj].filter(q=>q.lv===curLv);
   if(pool.length===0){alert('この科目・レベルの問題がありません');return;}
   queue=shuffle([...pool]).slice(0,Q_N);
   qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
-  hide('s-home');hide('s-settings');hide('s-lvl');show('s-quiz');hide('s-res');
+  hideAll();show('s-quiz');
   renderQ();
 }
 
 function renderQ(){
   answered=false;
   const card=queue[qi];
-  const m=META[curSubj];
+  const m=isWrongMode?(META[card.s]||META.math):META[curSubj];
   const pct=(qi/queue.length)*100;
   const pf=document.getElementById('qpf');
   pf.style.width=pct+'%';pf.style.background=m.grd;
@@ -570,6 +728,7 @@ function renderQ(){
 
 function answer(ok,card,btn,ch){
   if(answered)return;answered=true;
+  const subj=isWrongMode?card.s:curSubj;
   ch.querySelectorAll('.ch-btn').forEach(b=>{
     b.classList.add('off');
     if(b.textContent===card.a)b.classList.add('ok');
@@ -578,13 +737,24 @@ function answer(ok,card,btn,ch){
     btn.classList.add('ok');btn.classList.remove('off');
     combo++;if(combo>maxCombo)maxCombo=combo;
     const bonus=Math.min(combo-1,5)*2;const gain=10+bonus;score+=gain;correct++;
-    document.getElementById('fb').innerHTML='<span class="fb-ok">⭕ 正解！'+(bonus>0?' +'+gain+'pt コンボ！':'')+'</span>';
+    let fbExtra='';
+    if(isWrongMode){
+      const graduated=recordCorrectBank(card,subj);
+      if(graduated){graduatedCount++;fbExtra=' 🎓 卒業！';}
+      else{
+        const b=loadBank();const k=bankKey(card,subj);
+        const streak=b[k]?b[k].streak:3;
+        fbExtra=` (あと${3-streak}回正解で卒業)`;
+      }
+    }
+    document.getElementById('fb').innerHTML='<span class="fb-ok">⭕ 正解！'+(bonus>0?' +'+gain+'pt コンボ！':'')+fbExtra+'</span>';
     document.getElementById('fb-note').textContent=card.note?'解説：'+card.note:'';
   }else{
     btn.classList.add('ng');btn.classList.remove('off');combo=0;
     document.getElementById('fb').innerHTML='<span class="fb-ng">❌ 不正解</span>';
     document.getElementById('fb-note').textContent='正解：'+card.a+(card.note?' ／ '+card.note:'');
     wrongs.push(card);
+    recordWrong(card,subj);
   }
   document.getElementById('combo-n').textContent=combo;
   document.getElementById('qz-sc').textContent=score;
@@ -598,9 +768,11 @@ function nextQ(){qi++;if(qi>=queue.length){showResult();return;}renderQ();}
 /* ===== RESULT ===== */
 function showResult(){
   hide('s-quiz');show('s-res');
+  document.getElementById('wm-bar').classList.add('hidden');
   const tot=queue.length,acc=Math.round(correct/tot*100);
-  if(!stats[curSubj])stats[curSubj]={total:0,correct:0,pts:0};
-  stats[curSubj].total+=tot;stats[curSubj].correct+=correct;stats[curSubj].pts+=score;
+  const sk=isWrongMode?'wrong':curSubj;
+  if(!stats[sk])stats[sk]={total:0,correct:0,pts:0};
+  stats[sk].total+=tot;stats[sk].correct+=correct;stats[sk].pts+=score;
   saveStats();
   const tbl=[[100,'🏆','パーフェクト！最高だ！','全問正解！すごい！'],[80,'🎉','とてもよくできました！','あと少しで完璧！'],[60,'😊','よくできました！','間違えた問題を復習しよう'],[40,'💪','もう少し！がんばろう！','間違いをしっかり復習しよう'],[0,'📖','もう一度チャレンジ！','復習してから再挑戦しよう']];
   const row=tbl.find(r=>acc>=r[0]);
@@ -611,6 +783,9 @@ function showResult(){
   document.getElementById('rc').textContent=correct+' / '+tot+' 問正解';
   document.getElementById('rmx').textContent=maxCombo;
   document.getElementById('racc').textContent=acc+'%';
+  if(isWrongMode&&graduatedCount>0){
+    document.getElementById('rm').textContent+=' 🎓 '+graduatedCount+'問 卒業！';
+  }
   const wl=document.getElementById('wlist'),ws=document.getElementById('wsec');
   if(wrongs.length===0){ws.style.display='none';}else{
     ws.style.display='';
@@ -622,6 +797,7 @@ function showResult(){
 }
 
 function startRetry(cards){
+  isWrongMode=false;graduatedCount=0;
   queue=shuffle(cards);qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
   hide('s-res');show('s-quiz');renderQ();
 }
@@ -629,6 +805,7 @@ function startRetry(cards){
 /* ===== UTILS ===== */
 function show(id){document.getElementById(id).classList.remove('hidden');}
 function hide(id){document.getElementById(id).classList.add('hidden');}
+function hideAll(){['s-home','s-settings','s-parent','s-lvl','s-quiz','s-res'].forEach(id=>hide(id));}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
