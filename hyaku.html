@@ -1,0 +1,424 @@
+<title>100ます計算</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap">
+<style>
+:root {
+  --bg:#FFF8F0; --surface:#FFFFFF; --border:#E2DAFF; --text:#1A0A3D; --muted:#7B6E9A;
+  --shadow:0 2px 14px rgba(45,27,105,.08); --r:14px;
+  --accent:#4F46E5; --ok:#10B981; --ng:#EF4444; --gold:#F59E0B;
+  --hdr-bg:#4F46E5; --hdr-txt:#fff; --row-bg:#EEF2FF; --row-txt:#3730A3;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D0B1E; --surface:#161230; --border:#2A2550; --text:#EDE9FF; --muted:#8B7EB8;
+  --shadow:0 2px 14px rgba(0,0,0,.45);
+  --hdr-bg:#3730A3; --row-bg:#1E1B40; --row-txt:#A5B4FC;
+}}
+:root[data-theme="dark"]{
+  --bg:#0D0B1E; --surface:#161230; --border:#2A2550; --text:#EDE9FF; --muted:#8B7EB8;
+  --shadow:0 2px 14px rgba(0,0,0,.45);
+  --hdr-bg:#3730A3; --row-bg:#1E1B40; --row-txt:#A5B4FC;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;background:var(--bg);color:var(--text);padding-inline:16px;padding-block:20px 48px;}
+.hidden{display:none!important;}
+.screen{max-width:520px;margin-inline:auto;}
+
+/* HOME */
+.h-title{font-size:28px;font-weight:900;text-align:center;margin-bottom:3px;}
+.h-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;font-weight:700;}
+.best-bar{background:var(--surface);border-radius:12px;padding:11px 16px;margin-bottom:16px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;}
+.best-lbl{font-size:12px;font-weight:800;color:var(--muted);}
+.best-v{font-size:22px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;}
+.sect{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.op-btn{border:3px solid var(--border);border-radius:14px;padding:13px 10px;background:var(--surface);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:var(--shadow);transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent;}
+.op-btn.sel{border-color:var(--accent);background:#EEF2FF;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .op-btn.sel{background:#1E1B40;}}
+:root[data-theme="dark"] .op-btn.sel{background:#1E1B40;}
+.op-sym{font-size:30px;font-weight:900;line-height:1;}
+.op-nm{font-size:12px;font-weight:800;color:var(--muted);}
+.op-btn.sel .op-nm{color:var(--accent);}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;}
+.lv-btn{border:2px solid var(--border);border-radius:12px;padding:11px 6px;background:var(--surface);cursor:pointer;font-family:inherit;text-align:center;box-shadow:var(--shadow);transition:border-color .15s;-webkit-tap-highlight-color:transparent;}
+.lv-nm{font-size:13px;font-weight:800;color:var(--text);display:block;margin-bottom:2px;}
+.lv-rng{font-size:11px;color:var(--muted);font-weight:700;}
+.lv-btn.sel{border-color:#FF6B2B;}
+.lv-btn.sel .lv-nm{color:#FF6B2B;}
+.start-btn{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED);border:none;border-radius:14px;padding:18px;font-family:inherit;font-size:18px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 4px 22px rgba(79,70,229,.35);-webkit-tap-highlight-color:transparent;transition:transform .12s;}
+.start-btn:active{transform:scale(.97);}
+
+/* DRILL */
+.d-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;}
+.timer{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--accent);letter-spacing:-1px;line-height:1;}
+.prog{font-size:12px;font-weight:800;color:var(--muted);margin-top:3px;}
+.check-btn{background:linear-gradient(135deg,#10B981,#34D399);border:none;border-radius:12px;padding:12px 18px;font-family:inherit;font-size:15px;font-weight:900;color:#fff;cursor:pointer;white-space:nowrap;box-shadow:0 3px 12px rgba(16,185,129,.3);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.mode-bar{background:linear-gradient(90deg,var(--accent),#7C3AED);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:800;color:#fff;text-align:center;margin-bottom:8px;}
+.div-hint{background:var(--surface);border-radius:8px;padding:7px 12px;font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-bottom:8px;border:1px solid var(--border);}
+
+/* GRID */
+.grid-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-inline:-2px;padding-inline:2px;}
+.mas-tbl{border-collapse:separate;border-spacing:2px;width:100%;min-width:280px;}
+.hc{background:var(--hdr-bg);color:var(--hdr-txt);font-size:12px;font-weight:900;text-align:center;border-radius:5px;padding:4px 1px;font-variant-numeric:tabular-nums;min-width:24px;}
+.hc.corner{font-size:14px;background:var(--text);color:var(--bg);}
+.rc{background:var(--row-bg);color:var(--row-txt);font-size:12px;font-weight:900;text-align:center;border-radius:5px;padding:4px 1px;font-variant-numeric:tabular-nums;min-width:24px;}
+.rc.qmark{background:#94A3B8;color:#94A3B8;user-select:none;font-size:10px;}
+.mi{width:100%;min-width:24px;height:28px;border:2px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-family:inherit;font-size:12px;font-weight:800;text-align:center;outline:none;font-variant-numeric:tabular-nums;-moz-appearance:textfield;padding:0;transition:border-color .1s,background .1s;display:block;}
+.mi::-webkit-inner-spin-button,.mi::-webkit-outer-spin-button{-webkit-appearance:none;}
+.mi:focus{border-color:var(--accent);background:#EEF2FF;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .mi:focus{background:#1E1B40;}}
+:root[data-theme="dark"] .mi:focus{background:#1E1B40;}
+.mi.ok{border-color:var(--ok);background:#ECFDF5;color:var(--ok);}
+.mi.ng{border-color:var(--ng);background:#FEF2F2;color:var(--ng);}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .mi.ok{background:#052E1C;} :root:not([data-theme="light"]) .mi.ng{background:#2D0E0E;}}
+:root[data-theme="dark"] .mi.ok{background:#052E1C;}
+:root[data-theme="dark"] .mi.ng{background:#2D0E0E;}
+.mi.div-cell{font-size:10px;color:var(--muted);}
+
+/* RESULT */
+.rw{background:var(--surface);border-radius:16px;padding:28px 20px 24px;box-shadow:var(--shadow);text-align:center;margin-bottom:12px;}
+.rbadges{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}
+.bnew{background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;border-radius:99px;padding:4px 14px;font-size:13px;font-weight:900;}
+.bperf{background:linear-gradient(135deg,#10B981,#3B82F6);color:#fff;border-radius:99px;padding:4px 14px;font-size:13px;font-weight:900;}
+.rt{font-size:58px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1;letter-spacing:-2px;margin-bottom:4px;}
+.rtl{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:14px;}
+.rs{font-size:22px;font-weight:900;margin-bottom:4px;}
+.rb{font-size:13px;color:var(--gold);font-weight:800;}
+.cok{color:var(--ok);} .cng{color:var(--ng);}
+.retry-btn{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED);border:none;border-radius:14px;padding:16px;font-family:inherit;font-size:16px;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(79,70,229,.3);margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
+.home-btn2{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.shake{animation:shake .3s ease;}
+</style>
+
+<!-- HOME -->
+<div id="s-home" class="screen">
+  <p class="h-title">🧮 100ます計算</p>
+  <p class="h-sub">タイマーで自己ベストに挑戦！</p>
+
+  <div id="best-bar" class="best-bar hidden">
+    <span class="best-lbl" id="best-lbl">たし算 / かんたん　自己ベスト ⏱</span>
+    <span class="best-v" id="best-v">--:--</span>
+  </div>
+
+  <p class="sect">計算の種類</p>
+  <div class="op-grid">
+    <button class="op-btn sel" data-op="+" onclick="setOp(this)">
+      <span class="op-sym" style="color:#4F46E5">＋</span>
+      <span class="op-nm">たし算</span>
+    </button>
+    <button class="op-btn" data-op="-" onclick="setOp(this)">
+      <span class="op-sym" style="color:#7C3AED">－</span>
+      <span class="op-nm">ひき算</span>
+    </button>
+    <button class="op-btn" data-op="*" onclick="setOp(this)">
+      <span class="op-sym" style="color:#15803D">×</span>
+      <span class="op-nm">かけ算</span>
+    </button>
+    <button class="op-btn" data-op="/" onclick="setOp(this)">
+      <span class="op-sym" style="color:#B45309">÷</span>
+      <span class="op-nm">わり算</span>
+    </button>
+  </div>
+
+  <p class="sect">むずかしさ</p>
+  <div class="lv-grid">
+    <button class="lv-btn sel" data-lv="1" onclick="setLv(this)">
+      <span class="lv-nm">かんたん</span>
+      <span class="lv-rng">1〜5</span>
+    </button>
+    <button class="lv-btn" data-lv="2" onclick="setLv(this)">
+      <span class="lv-nm">ふつう</span>
+      <span class="lv-rng">1〜9</span>
+    </button>
+    <button class="lv-btn" data-lv="3" onclick="setLv(this)">
+      <span class="lv-nm">むずかしい</span>
+      <span class="lv-rng">1〜19</span>
+    </button>
+  </div>
+
+  <button class="start-btn" onclick="startDrill()">▶ スタート！</button>
+</div>
+
+<!-- DRILL -->
+<div id="s-drill" class="screen hidden">
+  <div class="d-top">
+    <div>
+      <div class="timer" id="timer-disp">00:00</div>
+      <div class="prog" id="prog-disp">0 / 100 こたえた</div>
+    </div>
+    <button class="check-btn" onclick="checkAnswers()">採点する ✓</button>
+  </div>
+  <div class="mode-bar" id="mode-bar"></div>
+  <div id="div-hint" class="div-hint hidden">マス目の数字 ÷ 上の列の数字 ＝ こたえを書こう！</div>
+  <div class="grid-scroll">
+    <table class="mas-tbl" id="mas-tbl"></table>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="s-result" class="screen hidden">
+  <div class="rw">
+    <div class="rbadges" id="rbadges"></div>
+    <div class="rt" id="rt">00:00</div>
+    <div class="rtl">かかった時間</div>
+    <div class="rs" id="rs"></div>
+    <div class="rb" id="rb"></div>
+  </div>
+  <button class="retry-btn" onclick="retryDrill()">🔄 もう一度！</button>
+  <button class="home-btn2" onclick="goHome()">🏠 ホームへ</button>
+</div>
+
+<script>
+const LS='hyaku-best';
+let curOp='+', curLv=1;
+let rowNums=[], colNums=[];
+let timerInt=null, startMs=0;
+let isChecked=false;
+
+const OP_NAMES={'+':'たし算','-':'ひき算','*':'かけ算','/':'わり算'};
+const LV_NAMES={1:'かんたん',2:'ふつう',3:'むずかしい'};
+
+function bestKey(){return LS+'-'+curOp+'-'+curLv;}
+function getBest(){try{return parseInt(localStorage.getItem(bestKey()))||0;}catch{return 0;}}
+function setBest(ms){try{localStorage.setItem(bestKey(),ms);}catch{}}
+
+function fmtMs(ms){
+  const s=Math.floor(ms/1000);
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+
+function updateBestBar(){
+  const b=getBest();
+  const bar=document.getElementById('best-bar');
+  document.getElementById('best-lbl').textContent=OP_NAMES[curOp]+' / '+LV_NAMES[curLv]+'　自己ベスト ⏱';
+  if(b>0){bar.classList.remove('hidden');document.getElementById('best-v').textContent=fmtMs(b);}
+  else{bar.classList.add('hidden');}
+}
+
+function setOp(btn){
+  document.querySelectorAll('.op-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  curOp=btn.dataset.op;
+  updateBestBar();
+}
+function setLv(btn){
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  curLv=parseInt(btn.dataset.lv);
+  updateBestBar();
+}
+
+function shufl(arr){
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+function randNums(min,max,count){
+  const pool=[];
+  for(let i=min;i<=max;i++) pool.push(i);
+  shufl(pool);
+  const res=[];
+  while(res.length<count){res.push(...shufl([...pool]));}
+  return res.slice(0,count);
+}
+
+function genNums(){
+  const maxMap={1:5,2:9,3:19};
+  const mx=maxMap[curLv];
+  if(curOp==='-'){
+    colNums=randNums(1,mx,10); // subtrahends
+    const rMin={1:5,2:9,3:20}[curLv], rMax={1:10,2:18,3:38}[curLv];
+    rowNums=randNums(rMin,rMax,10); // minuends (always ≥ max col)
+  } else if(curOp==='/'){
+    colNums=randNums(1,{1:5,2:9,3:9}[curLv],10); // divisors
+    rowNums=randNums(1,mx,10); // quotients
+  } else {
+    rowNums=randNums(1,mx,10);
+    colNums=randNums(1,mx,10);
+  }
+}
+
+function calcAns(r,c){
+  const a=rowNums[r], b=colNums[c];
+  if(curOp==='+') return a+b;
+  if(curOp==='-') return a-b;
+  if(curOp==='*') return a*b;
+  return a; // division: answer is the quotient stored in rowNums
+}
+
+function buildGrid(){
+  const tbl=document.getElementById('mas-tbl');
+  tbl.innerHTML='';
+  const sym={'+':'＋','-':'－','*':'×','/':'÷'}[curOp];
+
+  // Header row
+  const thead=tbl.createTHead();
+  const hr=thead.insertRow();
+  const corner=hr.insertCell();
+  corner.className='hc corner';
+  corner.textContent=sym;
+  for(let c=0;c<10;c++){
+    const th=hr.insertCell();
+    th.className='hc';
+    th.textContent=colNums[c];
+  }
+
+  // Data rows
+  const tbody=tbl.createTBody();
+  for(let r=0;r<10;r++){
+    const row=tbody.insertRow();
+    const rh=row.insertCell();
+    if(curOp==='/'){
+      rh.className='rc qmark';
+      rh.textContent='?';
+    } else {
+      rh.className='rc';
+      rh.textContent=rowNums[r];
+    }
+    for(let c=0;c<10;c++){
+      const td=row.insertCell();
+      const inp=document.createElement('input');
+      inp.type='number';
+      inp.id='i'+r+'_'+c;
+      const ans=calcAns(r,c);
+      inp.setAttribute('data-ans',ans);
+      inp.setAttribute('data-r',r);
+      inp.setAttribute('data-c',c);
+      if(curOp==='/'){
+        const dividend=rowNums[r]*colNums[c];
+        inp.className='mi div-cell';
+        inp.placeholder=String(dividend);
+        inp.title=dividend+'÷'+colNums[c]+'=?';
+      } else {
+        inp.className='mi';
+      }
+      inp.addEventListener('input',onInp);
+      inp.addEventListener('keydown',onKey);
+      td.appendChild(inp);
+    }
+  }
+}
+
+function onInp(){updateProg();}
+
+function onKey(e){
+  if(isChecked) return;
+  const inp=e.target;
+  const r=parseInt(inp.dataset.r), c=parseInt(inp.dataset.c);
+  if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();focusNext(r,c);return;}
+  // Auto-advance when value has enough digits
+  if(!e.ctrlKey&&!e.metaKey&&inp.value.length>=3){
+    setTimeout(()=>{focusNext(r,c);},0);
+  }
+}
+
+function focusNext(r,c){
+  let nr=r, nc=c+1;
+  if(nc>=10){nc=0;nr++;}
+  if(nr>=10){document.getElementById('check-focus-trap').focus();return;}
+  const nxt=document.getElementById('i'+nr+'_'+nc);
+  if(nxt) nxt.focus();
+}
+
+function updateProg(){
+  const all=document.querySelectorAll('.mi');
+  const filled=Array.from(all).filter(i=>i.value.trim()!=='').length;
+  document.getElementById('prog-disp').textContent=filled+' / 100 こたえた';
+}
+
+function startTimer(){
+  startMs=Date.now();
+  clearInterval(timerInt);
+  timerInt=setInterval(()=>{
+    document.getElementById('timer-disp').textContent=fmtMs(Date.now()-startMs);
+  },200);
+}
+
+function stopTimer(){clearInterval(timerInt);return Date.now()-startMs;}
+
+function startDrill(){
+  isChecked=false;
+  genNums();
+  buildGrid();
+
+  document.getElementById('mode-bar').textContent=OP_NAMES[curOp]+' ／ '+LV_NAMES[curLv];
+  const hint=document.getElementById('div-hint');
+  if(curOp==='/'){hint.classList.remove('hidden');}else{hint.classList.add('hidden');}
+
+  document.getElementById('s-home').classList.add('hidden');
+  document.getElementById('s-result').classList.add('hidden');
+  document.getElementById('s-drill').classList.remove('hidden');
+  document.getElementById('timer-disp').textContent='00:00';
+  document.getElementById('prog-disp').textContent='0 / 100 こたえた';
+
+  startTimer();
+  setTimeout(()=>{
+    const first=document.getElementById('i0_0');
+    if(first) first.focus();
+  },150);
+}
+
+function checkAnswers(){
+  const elapsed=stopTimer();
+  isChecked=true;
+  let correct=0;
+  const all=document.querySelectorAll('.mi');
+  all.forEach(inp=>{
+    const ans=parseInt(inp.getAttribute('data-ans'));
+    const val=parseInt(inp.value.trim());
+    if(!isNaN(val)&&val===ans){
+      inp.classList.add('ok');
+      correct++;
+    } else if(inp.value.trim()!==''){
+      inp.classList.add('ng');
+      inp.classList.add('shake');
+      setTimeout(()=>inp.classList.remove('shake'),400);
+    }
+  });
+  showResult(elapsed,correct);
+}
+
+function showResult(elapsed,correct){
+  const b=getBest();
+  const isNew=(b===0||elapsed<b)&&correct===100;
+  if(isNew) setBest(elapsed);
+
+  document.getElementById('rt').textContent=fmtMs(elapsed);
+
+  const badges=document.getElementById('rbadges');
+  badges.innerHTML='';
+  if(isNew){const s=document.createElement('span');s.className='bnew';s.textContent='🏆 新記録！';badges.appendChild(s);}
+  if(correct===100){const s=document.createElement('span');s.className='bperf';s.textContent='✨ パーフェクト！';badges.appendChild(s);}
+
+  const scoreEl=document.getElementById('rs');
+  if(correct===100){
+    scoreEl.innerHTML='<span class="cok">100問 全問正解！🎉</span>';
+  } else {
+    scoreEl.innerHTML='<span class="cok">'+correct+'問正解</span> ／ <span class="cng">'+(100-correct)+'問まちがい</span>';
+  }
+
+  const nb=getBest();
+  document.getElementById('rb').textContent=nb>0?'自己ベスト：'+fmtMs(nb):'';
+
+  document.getElementById('s-drill').classList.add('hidden');
+  document.getElementById('s-result').classList.remove('hidden');
+}
+
+function retryDrill(){startDrill();}
+
+function goHome(){
+  clearInterval(timerInt);
+  document.getElementById('s-drill').classList.add('hidden');
+  document.getElementById('s-result').classList.add('hidden');
+  document.getElementById('s-home').classList.remove('hidden');
+  updateBestBar();
+}
+
+// hidden focus trap for tab-out of grid
+const trap=document.createElement('button');
+trap.id='check-focus-trap';
+trap.style.cssText='position:absolute;opacity:0;pointer-events:none;width:0;height:0;';
+document.body.appendChild(trap);
+
+updateBestBar();
+</script>
