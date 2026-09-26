@@ -267,6 +267,11 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <div class="set-head">👩‍👧 保護者メニュー</div>
   </div>
   <div class="card">
+    <h3>📊 弱点分析</h3>
+    <div id="analysis-list" style="display:grid;gap:8px;"></div>
+  </div>
+  <button class="load-btn hidden" id="weekly-btn" onclick="startWeeklyTest()" style="margin-bottom:10px;background:linear-gradient(135deg,#8B5CF6,#6366F1);">📊 今週の確認テスト</button>
+  <div class="card">
     <h3 id="par-ttl">苦手問題 一覧</h3>
     <div id="par-list"></div>
   </div>
@@ -725,6 +730,44 @@ function updateReviewBadge(){
   if(cnt)cnt.textContent=review.length+'問';
 }
 
+/* ===== ANALYSIS & WEEKLY TEST ===== */
+function getWeaknessAnalysis(){
+  const analysis=Object.entries(stats)
+    .filter(([k])=>k!=='wrong')
+    .map(([k,v])=>{
+      const rate=v.total>0?Math.round(v.correct/v.total*100):0;
+      return {subject:k,total:v.total,correct:v.correct,rate,isWeak:rate<60};
+    })
+    .sort((a,b)=>a.rate-b.rate);
+  return analysis;
+}
+
+function isFridayToday(){
+  return new Date().getDay()===5;
+}
+
+function startWeeklyTest(){
+  const weakSubjects=getWeaknessAnalysis().filter(a=>a.isWeak).map(a=>a.subject);
+  if(weakSubjects.length===0){
+    alert('全ての教科が好調です！復習クイズで基礎を定着させましょう');
+    return;
+  }
+  const d=mergedData();
+  const pool=[];
+  weakSubjects.forEach(subj=>{
+    const qs=d[subj]||[];
+    pool.push(...qs);
+  });
+  if(pool.length<5){alert('テスト用の問題が足りません');return;}
+  isWrongMode=false;curSubj=null;curLv=0;graduatedCount=0;
+  queue=shuffle([...pool]).slice(0,10);
+  qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hideAll();show('s-quiz');
+  document.getElementById('wm-bar').innerHTML='📊 <b>今週の確認テスト</b> ― 弱点分野から出題';
+  document.getElementById('wm-bar').classList.remove('hidden');
+  renderQ();
+}
+
 /* ===== WRONG MODE ===== */
 let isWrongMode=false;
 let graduatedCount=0;
@@ -789,6 +832,25 @@ function startSimilarQuiz(){
 }
 
 function openParent(){
+  const analysis=getWeaknessAnalysis();
+  const aList=document.getElementById('analysis-list');
+  aList.innerHTML=analysis.map(a=>{
+    const m=META[a.subject];
+    const bar='█'.repeat(Math.ceil(a.rate/10))+'░'.repeat(10-Math.ceil(a.rate/10));
+    const label=a.isWeak?'⚠️ 要注意':'✅ 順調';
+    return `<div style="background:var(--surface);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-weight:800;font-size:14px;">${m.icon} ${m.name}</span>
+        <span style="font-size:20px;font-weight:800;color:${a.isWeak?'var(--ng)':'var(--ok)'}">${a.rate}%</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${bar} ${label}</div>
+      <div style="font-size:11px;color:var(--muted);">正解: ${a.correct} / ${a.total}問</div>
+    </div>`;
+  }).join('');
+
+  const weeklyBtn=document.getElementById('weekly-btn');
+  weeklyBtn.style.display=isFridayToday()?'block':'none';
+
   const b=loadBank();
   const list=document.getElementById('par-list');
   const keys=Object.keys(b);
