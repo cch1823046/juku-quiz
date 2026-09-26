@@ -186,6 +186,13 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <div><div class="hs-v" id="hs-c">0</div><div class="hs-l">正解数</div></div>
     <div><div class="hs-v" id="hs-p">0</div><div class="hs-l">ポイント</div></div>
   </div>
+  <button class="wb-btn hidden" id="rev-btn" onclick="startReviewQuiz()" style="background:linear-gradient(135deg,#06B6D4,#0891B2);margin-bottom:10px;">
+    <div class="wb-left">
+      <div class="wb-ico">📌</div>
+      <div><div class="wb-name">今日の復習</div><div class="wb-sub">スペーシング復習</div></div>
+    </div>
+    <div class="wb-badge" id="rev-count">0</div>
+  </button>
   <button class="wb-btn hidden" id="wb-btn" onclick="startWrongMode()">
     <div class="wb-left">
       <div class="wb-ico">🎯</div>
@@ -688,8 +695,8 @@ function bankKey(card,subj){return (subj||card.s||'?')+'§'+card.q.substring(0,4
 function recordWrong(card,subj){
   const k=bankKey(card,subj);
   const b=loadBank();
-  if(!b[k])b[k]={...card,s:subj,count:0,streak:0,lastDate:''};
-  b[k].count++;b[k].streak=0;b[k].lastDate=new Date().toLocaleDateString('ja-JP');
+  if(!b[k])b[k]={...card,s:subj,count:0,streak:0,lastWrongTime:0,lastDate:''};
+  b[k].count++;b[k].streak=0;b[k].lastWrongTime=Date.now();b[k].lastDate=new Date().toLocaleDateString('ja-JP');
   saveBank(b);updateWrongBadge();
 }
 
@@ -710,6 +717,14 @@ function updateWrongBadge(){
   if(cnt)cnt.textContent=n+'問';
 }
 
+function updateReviewBadge(){
+  const review=getTodayReview();
+  const btn=document.getElementById('rev-btn');
+  const cnt=document.getElementById('rev-count');
+  if(btn){btn.classList.toggle('hidden',review.length===0);}
+  if(cnt)cnt.textContent=review.length+'問';
+}
+
 /* ===== WRONG MODE ===== */
 let isWrongMode=false;
 let graduatedCount=0;
@@ -722,6 +737,32 @@ function startWrongMode(){
   queue=shuffle([...pool]).slice(0,Math.min(10,pool.length));
   qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
   hideAll();show('s-quiz');
+  document.getElementById('wm-bar').classList.remove('hidden');
+  renderQ();
+}
+
+/* ===== SPACING REVIEW ===== */
+function getTodayReview(){
+  const b=loadBank();
+  const now=Date.now();
+  const dayMs=86400000;
+  const review=Object.values(b).filter(c=>{
+    const t=c.lastWrongTime||0;
+    if(t===0)return false;
+    const daysAgo=Math.floor((now-t)/dayMs);
+    return [1,3,7].includes(daysAgo);
+  });
+  return review;
+}
+
+function startReviewQuiz(){
+  const review=getTodayReview();
+  if(review.length===0){alert('今日の復習問題はありません！明日以降、復習対象が出てきます');return;}
+  isWrongMode=true;curSubj=null;curLv=0;graduatedCount=0;
+  queue=shuffle([...review]).slice(0,Math.min(5,review.length));
+  qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hideAll();show('s-quiz');
+  document.getElementById('wm-bar').innerHTML='📌 <b>スペーシング復習</b> ― スケジュール対象の問題です';
   document.getElementById('wm-bar').classList.remove('hidden');
   renderQ();
 }
@@ -933,7 +974,7 @@ function goHome(){
   document.getElementById('hs-p').textContent=s.reduce((a,v)=>a+(v.pts||0),0);
   const ts=localStorage.getItem(LS_TS)||'初期データ';
   document.getElementById('upd-ts').textContent=`最終更新: ${ts}`;
-  updateWrongBadge();
+  updateWrongBadge();updateReviewBadge();
   hideAll();show('s-home');
 }
 
