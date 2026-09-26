@@ -186,6 +186,13 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <div><div class="hs-v" id="hs-c">0</div><div class="hs-l">正解数</div></div>
     <div><div class="hs-v" id="hs-p">0</div><div class="hs-l">ポイント</div></div>
   </div>
+  <button class="wb-btn hidden" id="rev-btn" onclick="startReviewQuiz()" style="background:linear-gradient(135deg,#06B6D4,#0891B2);margin-bottom:10px;">
+    <div class="wb-left">
+      <div class="wb-ico">📌</div>
+      <div><div class="wb-name">今日の復習</div><div class="wb-sub">スペーシング復習</div></div>
+    </div>
+    <div class="wb-badge" id="rev-count">0</div>
+  </button>
   <button class="wb-btn hidden" id="wb-btn" onclick="startWrongMode()">
     <div class="wb-left">
       <div class="wb-ico">🎯</div>
@@ -259,6 +266,11 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <button class="set-back" onclick="goHome()">←</button>
     <div class="set-head">👩‍👧 保護者メニュー</div>
   </div>
+  <div class="card">
+    <h3>📊 弱点分析</h3>
+    <div id="analysis-list" style="display:grid;gap:8px;"></div>
+  </div>
+  <button class="load-btn hidden" id="weekly-btn" onclick="startWeeklyTest()" style="margin-bottom:10px;background:linear-gradient(135deg,#8B5CF6,#6366F1);">📊 今週の確認テスト</button>
   <div class="card">
     <h3 id="par-ttl">苦手問題 一覧</h3>
     <div id="par-list"></div>
@@ -437,6 +449,31 @@ jpn:[
   {q:'「棚から牡丹餅」の意味は？',a:'予期しない幸運が訪れる',w:['牡丹餅は棚にある','棚から物が落ちる','食べ物は大切にすべき'],lv:2},
   {q:'「初心忘るべからず」の意味は？',a:'最初の気持ちや目的を忘れてはいけない',w:['心は初めだけ大切','忘れてしまう人が多い','初めのことは覚えているべき'],lv:3},
   {q:'「転ばぬ先の杖」の意味は？',a:'事前に準備や対策をしておく',w:['杖があれば転ばない','転ぶ前に杖をつく','転ぶことは悪いこと'],lv:2},
+],
+math_add:[
+  {q:'2の5乗（2^5）は？',a:'32',w:['16','64','10'],lv:2},{q:'√144は？',a:'12',w:['14','10','11'],lv:2},
+  {q:'時速60kmで30分走った距離は？',a:'30km',w:['60km','15km','90km'],lv:1},{q:'定価500円の40%OFFの値段は？',a:'300円',w:['200円','350円','250円'],lv:2},
+  {q:'正六面体（立方体）の面の数は？',a:'6',w:['8','12','4'],lv:1},
+],
+sci_add:[
+  {q:'細胞の核に含まれるものは？',a:'DNA',w:['RNA','タンパク質','脂肪'],lv:2},{q:'葉で光合成が行われる場所は？',a:'葉緑体',w:['核','ミトコンドリア','液胞'],lv:2},
+  {q:'消化酵素ペプシンが働く場所は？',a:'胃',w:['食道','小腸','大腸'],lv:2},{q:'人間の骨の数は約何本？',a:'206本',w:['306本','106本','406本'],lv:2},
+  {q:'音の速さは約秒速何m？',a:'340m',w:['3400m','34m','3040m'],lv:1},
+],
+soc_add:[
+  {q:'『源氏物語』の作者は？',a:'紫式部',w:['清少納言','空海','最澄'],lv:2},{q:'室町幕府を開いたのは？',a:'足利尊氏',w:['源頼朝','織田信長','豊臣秀吉'],lv:2},
+  {q:'戦国時代の日本は幾つの国に分かれていた？',a:'大小約100～200',w:['50～100','300以上','10～30'],lv:3},{q:'松島は現在どの県にある？',a:'宮城県',w:['福島県','岩手県','青森県'],lv:1},
+  {q:'江戸時代のオランダとの貿易の中心地は？',a:'長崎',w:['横浜','神戸','大阪'],lv:2},
+],
+eng_add:[
+  {q:'"rain"の意味は？',a:'雨',w:['雲','風','雪'],lv:1},{q:'"I like apples."の意味は？',a:'私はりんごが好きです',w:['私はりんごを食べます','りんごは好きな果物です','私はりんごが欲しい'],lv:1},
+  {q:'"There is a pen on the desk."の意味は？',a:'机の上にペンがあります',w:['ペンは机にあります','その机にペンがあります','机はペンの上にあります'],lv:1},{q:'"How old are you?"への答え方は？',a:'I am 12 years old.',w:['I am 12.','I have 12 years.','I am 12 year old.'],lv:1},
+  {q:'"Nice to meet you."への返事は？',a:'Nice to meet you too.',w:['Nice to you.','Meet you too.','Nice too.'],lv:1},
+],
+jpn_add:[
+  {q:'「風流」の読みは？',a:'ふうりゅう',w:['ふじゅう','ふうる','かぜながれ'],lv:2},{q:'「知識」の読みは？',a:'ちしき',w:['ちしい','ちしく','こんにちは'],lv:1},
+  {q:'「船出」の読みは？',a:'ふなで',w:['せんしゅつ','ふねだし','ふなの'],lv:2},{q:'「船漕ぐ」の読みは？',a:'ふなこぐ',w:['ふねこう','ふながく','ふなへ'],lv:3},
+  {q:'「案ずるより生むが易し」の意味は？',a:'実際にやってみると想像より簡単なことが多い',w:['子どもを産むのは不安でも簡単','考えすぎるより行動しろ','産むことは生きることより易しい'],lv:3},
 ]};
 
 /* ===== CSV TEMPLATE ===== */
@@ -481,8 +518,8 @@ function bankKey(card,subj){return (subj||card.s||'?')+'§'+card.q.substring(0,4
 function recordWrong(card,subj){
   const k=bankKey(card,subj);
   const b=loadBank();
-  if(!b[k])b[k]={...card,s:subj,count:0,streak:0,lastDate:''};
-  b[k].count++;b[k].streak=0;b[k].lastDate=new Date().toLocaleDateString('ja-JP');
+  if(!b[k])b[k]={...card,s:subj,count:0,streak:0,lastWrongTime:0,lastDate:''};
+  b[k].count++;b[k].streak=0;b[k].lastWrongTime=Date.now();b[k].lastDate=new Date().toLocaleDateString('ja-JP');
   saveBank(b);updateWrongBadge();
 }
 
@@ -501,6 +538,78 @@ function updateWrongBadge(){
   const cnt=document.getElementById('wb-count');
   if(btn){btn.classList.toggle('hidden',n===0);}
   if(cnt)cnt.textContent=n+'問';
+}
+
+/* ===== SPACING REVIEW ===== */
+function getTodayReview(){
+  const b=loadBank();
+  const now=Date.now();
+  const dayMs=86400000;
+  const review=Object.values(b).filter(c=>{
+    const t=c.lastWrongTime||0;
+    if(t===0)return false;
+    const daysAgo=Math.floor((now-t)/dayMs);
+    return [1,3,7].includes(daysAgo);
+  });
+  return review;
+}
+
+function startReviewQuiz(){
+  const review=getTodayReview();
+  if(review.length===0){alert('今日の復習問題はありません！明日以降、復習対象が出てきます');return;}
+  isWrongMode=true;curSubj=null;curLv=0;graduatedCount=0;
+  queue=shuffle([...review]).slice(0,Math.min(5,review.length));
+  qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hideAll();show('s-quiz');
+  document.getElementById('wm-bar').innerHTML='📌 <b>スペーシング復習</b> ― スケジュール対象の問題です';
+  document.getElementById('wm-bar').classList.remove('hidden');
+  renderQ();
+}
+
+function updateReviewBadge(){
+  const review=getTodayReview();
+  const btn=document.getElementById('rev-btn');
+  const cnt=document.getElementById('rev-count');
+  if(btn){btn.classList.toggle('hidden',review.length===0);}
+  if(cnt)cnt.textContent=review.length+'問';
+}
+
+/* ===== ANALYSIS & WEEKLY TEST ===== */
+function getWeaknessAnalysis(){
+  const analysis=Object.entries(stats)
+    .filter(([k])=>k!=='wrong')
+    .map(([k,v])=>{
+      const rate=v.total>0?Math.round(v.correct/v.total*100):0;
+      return {subject:k,total:v.total,correct:v.correct,rate,isWeak:rate<60};
+    })
+    .sort((a,b)=>a.rate-b.rate);
+  return analysis;
+}
+
+function isFridayToday(){
+  return new Date().getDay()===5;
+}
+
+function startWeeklyTest(){
+  const weakSubjects=getWeaknessAnalysis().filter(a=>a.isWeak).map(a=>a.subject);
+  if(weakSubjects.length===0){
+    alert('全ての教科が好調です！復習クイズで基礎を定着させましょう');
+    return;
+  }
+  const d=mergedData();
+  const pool=[];
+  weakSubjects.forEach(subj=>{
+    const qs=d[subj]||[];
+    pool.push(...qs);
+  });
+  if(pool.length<5){alert('テスト用の問題が足りません');return;}
+  isWrongMode=false;curSubj=null;curLv=0;graduatedCount=0;
+  queue=shuffle([...pool]).slice(0,10);
+  qi=0;combo=0;maxCombo=0;score=0;correct=0;wrongs=[];
+  hideAll();show('s-quiz');
+  document.getElementById('wm-bar').innerHTML='📊 <b>今週の確認テスト</b> ― 弱点分野から出題';
+  document.getElementById('wm-bar').classList.remove('hidden');
+  renderQ();
 }
 
 /* ===== WRONG MODE ===== */
@@ -541,6 +650,25 @@ function startSimilarQuiz(){
 }
 
 function openParent(){
+  const analysis=getWeaknessAnalysis();
+  const aList=document.getElementById('analysis-list');
+  aList.innerHTML=analysis.map(a=>{
+    const m=META[a.subject];
+    const bar='█'.repeat(Math.ceil(a.rate/10))+'░'.repeat(10-Math.ceil(a.rate/10));
+    const label=a.isWeak?'⚠️ 要注意':'✅ 順調';
+    return `<div style="background:var(--surface);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-weight:800;font-size:14px;">${m.icon} ${m.name}</span>
+        <span style="font-size:20px;font-weight:800;color:${a.isWeak?'var(--ng)':'var(--ok)'}">${a.rate}%</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${bar} ${label}</div>
+      <div style="font-size:11px;color:var(--muted);">正解: ${a.correct} / ${a.total}問</div>
+    </div>`;
+  }).join('');
+
+  const weeklyBtn=document.getElementById('weekly-btn');
+  weeklyBtn.style.display=isFridayToday()?'block':'none';
+
   const b=loadBank();
   const list=document.getElementById('par-list');
   const keys=Object.keys(b);
@@ -609,7 +737,7 @@ try{EXTRA=JSON.parse(localStorage.getItem(LS_DATA)||'{}')}catch{}
 function mergedData(){
   const d={};
   Object.keys(META).forEach(k=>{
-    d[k]=[...(DEFAULT_DATA[k]||[]),...(EXTRA[k]||[])];
+    d[k]=[...(DEFAULT_DATA[k]||[]),...(DEFAULT_DATA[k+'_add']||[]),...(EXTRA[k]||[])];
   });
   return d;
 }
@@ -726,7 +854,7 @@ function goHome(){
   document.getElementById('hs-p').textContent=s.reduce((a,v)=>a+(v.pts||0),0);
   const ts=localStorage.getItem(LS_TS)||'初期データ';
   document.getElementById('upd-ts').textContent=`最終更新: ${ts}`;
-  updateWrongBadge();
+  updateWrongBadge();updateReviewBadge();
   hideAll();show('s-home');
 }
 
