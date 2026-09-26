@@ -263,6 +263,7 @@ body{font-family:'M PLUS Rounded 1c','Hiragino Kaku Gothic ProN',sans-serif;back
     <h3 id="par-ttl">苦手問題 一覧</h3>
     <div id="par-list"></div>
   </div>
+  <button class="load-btn" id="sim-btn" onclick="startSimilarQuiz()" style="margin-bottom:10px;display:none">🎯 類似問題で復習する</button>
   <button class="load-btn" onclick="exportWrongCSV()" style="margin-bottom:10px">📥 苦手問題をCSVでダウンロード</button>
   <button class="danger-btn" onclick="clearAllWrongs()">🗑️ 全部リセット（苦手リストを空にする）</button>
   <button class="p-btn p-ghost" style="margin-top:6px" onclick="goHome()">ホームに戻る</button>
@@ -519,11 +520,32 @@ function startWrongMode(){
 }
 
 /* ===== PARENT PANEL ===== */
+function startSimilarQuiz(){
+  const b=loadBank();
+  const keys=Object.keys(b);
+  if(keys.length===0){alert('苦手問題がないので類似問題は出題できません');return;}
+  const subLvMap={};
+  keys.forEach(k=>{const c=b[k];const key=c.s+'_'+c.lv;subLvMap[key]=(subLvMap[key]||0)+1;});
+  let maxKey='',maxCnt=0;
+  Object.keys(subLvMap).forEach(k=>{if(subLvMap[k]>maxCnt){maxCnt=subLvMap[k];maxKey=k;}});
+  const [subject,level]=maxKey.split('_');
+  const wrongIds=new Set(keys);
+  const d=DEFAULT_DATA[subject]||[];
+  const candidates=d.filter(q=>q.lv===parseInt(level)&&!wrongIds.has(bankKey(q,subject)));
+  if(candidates.length<5){alert('類似問題が足りません（最低5問必要）');return;}
+  const shuffled=candidates.sort(()=>Math.random()-0.5).slice(0,5);
+  Q_SET=shuffled;
+  Q_IDX=0;QS=0;COMBO=0;WRONG_MODE=1;
+  hideAll();show('s-quiz');document.getElementById('wm-bar').classList.remove('hidden');
+  loadQuestion();
+}
+
 function openParent(){
   const b=loadBank();
   const list=document.getElementById('par-list');
   const keys=Object.keys(b);
   document.getElementById('par-ttl').textContent='苦手問題 一覧（'+keys.length+'問）';
+  document.getElementById('sim-btn').style.display=keys.length>0?'block':'none';
   if(keys.length===0){
     list.innerHTML='<div class="par-empty">🎉 苦手問題なし！<br>すごい！よく覚えています</div>';
   } else {
